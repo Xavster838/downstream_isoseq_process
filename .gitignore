@@ -2,5 +2,7 @@
 .snakemake/**
 results/**
 logs/**
+alignments/**
+tmp/**
 .snakemake/**
 **.code-workspace
