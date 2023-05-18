@@ -1,4 +1,4 @@
-manifest : ".test/test_manifest.txt" 
+manifest : "/net/eichler/vol26/home/guitarfx/software/github_clones/downstream_isoseq_process/.test/test_manifest.txt" #"../.test/test_manifest.txt" 
 Hsa_ref : /net/eichler/vol26/eee_shared/assemblies/hg38/no_alt/hg38.no_alt.fa
 T2T_ref : /net/eichler/vol26/projects/chm13_t2t/nobackups/assemblies/T2T-CHM13v2.fasta
 min_read_length : 1000
