@@ -40,7 +40,7 @@ if TEMP_DIR != "temp":
 
 rule all:
     input:
-       tmp_fastqs = [f"tmp/{SMP}_{SPRPOP}.fastq.gz" for SMP, SPRPOP in list(zip(manifest_df["sample"] , manifest_df["superpop"])) ]
+       tmp_fastqs = [f"tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_2.fastq" for SMP, SPRPOP in list(zip(manifest_df["sample"] , manifest_df["superpop"])) ]
 
 
 
