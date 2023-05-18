@@ -2,6 +2,7 @@ import os
 import sys
 import math
 from snakemake.utils import min_version
+import pandas as pd
 
 min_version("6.0")
 
@@ -12,13 +13,17 @@ shell.prefix(f"set -eo pipefail;")
 #report: "report/workflow.rst"
 
 #specify config file
-configfile: "config/config.yaml"
+configfile: f"{SDIR}/../.test/config.yaml"
 #include common functions
-include: rules/common.smk
+include: "rules/common.smk"
 #get manifest
-manifest_df = pd.read_csv(config["manifest"], sep="\t", index_col="sample", dtype=str)
+os.listdir()
+manifest_df = pd.read_csv(config["manifest"], sep="\t", dtype=str)
+manifest_df  = manifest_df.set_index(["sample"], drop = False)
 
-
+wildcard_constraints:
+    SMP = "|".join(manifest_df["sample"]),
+    SPRPOP = "|".join(manifest_df["superpop"])
 
 TEMP_DIR = config.pop("tempdir", "temp")
 if TEMP_DIR != "temp":
@@ -35,7 +40,7 @@ if TEMP_DIR != "temp":
 
 rule all:
     input:
-       tmp_fastqs = [f"tmp/{sample}_{superpop}.fastq.gz" for sample, superpop in list(zip(manifest_df["sample"] , manifest_df["superpop"])) ]
+       tmp_fastqs = [f"tmp/{SMP}_{SPRPOP}.fastq.gz" for SMP, SPRPOP in list(zip(manifest_df["sample"] , manifest_df["superpop"])) ]
 
 
 
