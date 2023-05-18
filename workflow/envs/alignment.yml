@@ -1,0 +1,14 @@
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - minimap2
+  - samtools
+  - biopython
+  - regex
+  - glob
+  - pandas
+  - numpy
+  - pathlib
+  - tempfile
