@@ -9,10 +9,15 @@ SDIR = os.path.realpath(os.path.dirname(srcdir("Snakefile")))
 shell.prefix(f"set -eo pipefail;")
 
 
-report: "report/workflow.rst"
+#report: "report/workflow.rst"
 
-
+#specify config file
 configfile: "config/config.yaml"
+#include common functions
+include: rules/common.smk
+#get manifest
+manifest_df = pd.read_csv(config["manifest"], sep="\t", index_col="sample", dtype=str)
+
 
 
 TEMP_DIR = config.pop("tempdir", "temp")
@@ -30,32 +35,8 @@ if TEMP_DIR != "temp":
 
 rule all:
     input:
-        [],
+       tmp_fastqs = [f"tmp/{sample}_{superpop}.fastq.gz" for sample, superpop in list(zip(manifest_df["sample"] , manifest_df["superpop"])) ]
 
 
-rule RepeatMasker:
-    input:
-        fasta="a.fasta",
-    output:
-        out="a.out",
-    resources:
-        mem=config.get("mem", 8),
-    threads: config.get("threads", 8)
-    conda:
-        "envs/env.yml"
-    log:
-        "rm.out.log",
-    params:
-        opts=config.get("RepeatMaskerOptions", "-s -xsamll -e ncbi"),
-        species=config.get("RepeatMaskerSpecies", "human"),
-    shell:
-        """
-        RepeatMasker \
-            -s \
-            -xsmall \
-            -e ncbi \
-            -species {params.species} \
-            -dir $(dirname {input.fasta}) \
-            -pa {threads} \
-            {input.fasta}  2> {log}
-        """
+
+include: "rules/alignment_rules.smk"
