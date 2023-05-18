@@ -6,22 +6,61 @@ rule fastq_from_bam:
         fastq = temp("tmp/{SMP}_{SPRPOP}.fastq.gz"),
     resources:
         mem_mb=8000
-    conda:
-        "../envs/alignment.yml"
+    # conda:
+    #     "../envs/alignment.yml"
     log:
         "logs/{SMP}_{SPRPOP}_fastq_from_bam.log"
     threads: 2
+   run:
+       # chekc if bam
+       if(input["read"][-4:]==".bam"):
+           shell("bedtools bamtofastq -i {input.read} -fq /dev/stdout | gzip > {output.fastq}")
+       elif(input["read"][-6:]==".fastq" or input["read"][-3:]==".fq"):
+           shell("cp {input.read} {output.fastq}")
+           shell("gzip {output.fastq}")
+       elif( input["read"][-9:]==".fastq.gz" or input["read"][-6:]==".fq.gz" ):
+           shell("ln -s {input.read} {output.fastq}")
+       else:
+           raise Exception(f"Input Error : iso_seq supported formats are fastqs and bams. File passed : {input.read}")
+
+
+rule filter_fastq:
+    input:
+        fastq = rules.fastq_from_bam.output.fastq
+    output:
+        fastq = temp("tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED.fastq.gz")
+    resources:
+        mem_mb = 4000
+    threads : 4
+    conda:
+        "../envs/alignment.yml"
+    params:
+        min_len = config['min_read_length'] ,
+        min_qual = config['min_read_quality']
     shell:'''
-touch {output.fastq}
+        seqkit seq -j {threads} --min-len {params.min_len} --min-qual {params.min_qual} {input.fastq} -o - | gzip -c > {output.fastq}
 '''
-#    run:
-#        # chekc if bam
-#        if(input["read"][-4:]==".bam"):
-#            shell("bedtools bamtofastq -i {input.read} -fq /dev/stdout | gzip > {output.fastq}")
-#        elif(input["read"][-6:]==".fastq" or input["read"][-3:]==".fq"):
-#            shell("cp {input.read} {output.fastq}")
-#            shell("gzip {output.fastq}")
-#        elif( input["read"][-9:]==".fastq.gz" or input["read"][-6:]==".fq.gz" ):
-#            shell("ln -s {input.read} {output.fastq}")
-#        else:
-#            raise Exception(f"Input Error : iso_seq supported formats are fastqs and bams. File passed : {input.read}")
+
+fracIDs=list(range(20))
+rule split_fastq:
+    input:
+        fastq = rules.filter_fastq.output.fastq #"iso_fastas/{species}/{read}.fasta",
+    output:
+        fastq = temp(expand("tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_{frac}.fastq", frac=fracIDs)),
+    resources:
+        mem_mb=8000
+    threads:1
+    run:
+        import gzip
+        from Bio import SeqIO
+        outs = output["fastq"]
+        with gzip.open( input.fastq , "rt") as handle:
+            recs = list( SeqIO.parse(handle, "fastq") )
+            nrecs = len(recs)
+            nouts = len(outs)
+
+            for idx, out in enumerate(outs):
+                start = int( idx*nrecs/nouts)
+                end = int(  (idx + 1)*nrecs/nouts)
+                print(start, end, nrecs)
+                SeqIO.write(recs[start:end], out, "fastq")
