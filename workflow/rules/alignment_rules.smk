@@ -135,7 +135,7 @@ rule map_mm:
         fasta = "tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_{frac}.fastq",  #rules.split_fastq.output.fastq , #"iso_fastqs/{species}/{sample}/{species}_{sample}_{frac}.fastq" ,  #"iso_fastas/{species}/{read}_{frac}.fasta",
         mmi = get_species_ref_path 
     output:
-        bam = temp("tmp/alignments/{SMP}_{SPRPOP}_FILTERED_{frac}_{ref_name}.mm.bam"),
+        bam = temp("tmp/alignments/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{frac}_{ref_name}.mm.bam"),
     benchmark:
         "benchmarks/{SMP}_{SPRPOP}_FILTERED_{frac}_{ref_name}.mm.bam.bench",
     wildcard_constraints:
@@ -155,10 +155,10 @@ rule map_mm:
 
 rule mergeBams:
     input:
-        bams = expand("tmp/alignments/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{ref_name}}.mm.bam" , frac = fracIDs) #"alignments/{{species}}/reads{{read}}_{frac}.mm.bam", frac=fracIDs),
+        bams = expand("tmp/alignments/{{ref_name}}/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{ref_name}}.mm.bam" , frac = fracIDs) #"alignments/{{species}}/reads{{read}}_{frac}.mm.bam", frac=fracIDs),
     output:
-        bam= "alignments/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
-        bai= "alignments/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
+        bam= "alignments/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
+        bai= "alignments/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
     resources:
         mem_mb = 8000 #lambda wildcards, attempt: 8 + 8 * attempt,
     conda:
@@ -178,7 +178,7 @@ rule map_mm_t2t:
         fasta = "tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_{frac}.fastq",  #rules.split_fastq.output.fastq , #"iso_fastqs/{species}/{sample}/{species}_{sample}_{frac}.fastq" ,  #"iso_fastas/{species}/{read}_{frac}.fasta",
         mmi = "mmdb/{t2t_version}_ref.mmi" 
     output:
-        bam = temp("tmp/alignments/{SMP}_{SPRPOP}_FILTERED_{frac}_{t2t_version}.mm.bam"),
+        bam = temp("tmp/alignments/t2t/{SMP}_{SPRPOP}_FILTERED_{frac}_{t2t_version}.mm.bam"),
     benchmark:
         "benchmarks/{SMP}_{SPRPOP}_FILTERED_{frac}_{t2t_version}.mm.bam.bench",
     wildcard_constraints:
@@ -198,10 +198,10 @@ rule map_mm_t2t:
 
 rule mergeBams_t2t:
     input:
-        bams = expand("tmp/alignments/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{t2t_version}}.mm.bam" , frac = fracIDs) #"alignments/{{species}}/reads{{read}}_{frac}.mm.bam", frac=fracIDs),
+        bams = expand("tmp/alignments/t2t/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{t2t_version}}.mm.bam" , frac = fracIDs) #"alignments/{{species}}/reads{{read}}_{frac}.mm.bam", frac=fracIDs),
     output:
-        bam= "alignments/{SMP}_{SPRPOP}_FILTERED_{t2t_version}.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
-        bai= "alignments/{SMP}_{SPRPOP}_FILTERED_{t2t_version}.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
+        bam= "alignments/t2t/{SMP}_{SPRPOP}_FILTERED_{t2t_version}.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
+        bai= "alignments/t2t/{SMP}_{SPRPOP}_FILTERED_{t2t_version}.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
     resources:
         mem_mb = 8000 #lambda wildcards, attempt: 8 + 8 * attempt,
     conda:
