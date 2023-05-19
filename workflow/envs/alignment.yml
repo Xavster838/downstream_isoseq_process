@@ -4,7 +4,7 @@ channels:
   - defaults
 dependencies:
   - minimap2
-  - samtools
+  - samtools/1.17
   - seqkit
   - biopython
   - regex
