@@ -103,3 +103,31 @@ rule mm_index_hg38:
     shell:"""
 {MMCMD} -t {threads} -d {output.mmi} {input.fasta}
 """
+
+
+#get alignment to reference (NHP not T2T or hg38)
+ref_link_list = [ get_species_ref_link(cur_row) for i, cur_row in manifest.iterrows() ]
+nhp_ref_dict = { (r['species'], r['ref_name'] ) : r['ref_path'] for r in ref_link_list}
+
+def get_species_sample_ref_path(wc):
+    '''given species sample combo, return reference fasta to index.'''
+    return nhp_ref_dict[wc['species'], wc['ref_name']]
+
+rule mm_index_nhp_ref:
+    input:
+        fasta = get_species_sample_ref_path,
+        human_mmi = rules.mm_index_t2t.output.mmi
+    output:
+        mmi = "mmdb/{species}/{ref_name}_ref.mmi" # get_species_ref_path 
+    wildcard_constraints:
+        ref_name = "|".join( [Path(x).stem for x in manifest['nhp_ref']] )
+    resources:
+        mem_mb = 10000
+    threads:4
+    shell:"""
+if [[ {input.fasta} -ef {Hsa_ref} ]]; then 
+    ln -s {input.human_mmi} {output.mmi}
+else
+    {MMCMD} -t {threads} -d {output.mmi} {input.fasta}
+fi
+"""
