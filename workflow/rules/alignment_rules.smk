@@ -80,7 +80,7 @@ rule mm_index_t2t:
     conda:
         "../envs/alignment.yml"
     log:
-        "logs/T2T_index.log"
+        "logs/{t2t_version}_index.log"
     wildcard_constraints:
         t2t_version = Path(config['T2T_ref']).stem
     threads: 4
