@@ -11,7 +11,7 @@ rule fastq_from_bam:
     log:
         "logs/{SMP}_{SPRPOP}_fastq_from_bam.log"
     threads: 2
-   run:
+    run:
        # chekc if bam
        if(input["read"][-4:]==".bam"):
            shell("bedtools bamtofastq -i {input.read} -fq /dev/stdout | gzip > {output.fastq}")
@@ -46,7 +46,7 @@ rule split_fastq:
     input:
         fastq = rules.filter_fastq.output.fastq #"iso_fastas/{species}/{read}.fasta",
     output:
-        fastq = temp(expand("tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_{frac}.fastq", frac=fracIDs)),
+        fastq = temp(expand("tmp/iso_fastqs/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}.fastq", frac=fracIDs)),
     resources:
         mem_mb=8000
     threads:1
