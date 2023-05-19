@@ -118,7 +118,7 @@ rule mm_index_nhp_ref:
         fasta = get_species_sample_ref_path,
         human_mmi = rules.mm_index_t2t.output.mmi
     output:
-        mmi = "mmdb/{species}/{ref_name}_ref.mmi" # get_species_ref_path 
+        mmi = "mmdb/{ref_name}_ref.mmi" # get_species_ref_path 
     wildcard_constraints:
         ref_name = "|".join( [Path(x).stem for x in manifest['nhp_ref']] )
     resources:
