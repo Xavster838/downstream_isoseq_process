@@ -8,8 +8,8 @@ def get_nhp_ref(manifest_row):
     '''given sample species combo, get nhp_ref path'''
     return manifest_row.reference #need to use list indexing for sample variable because sample is a function of dataframes.
 
-def get_species_ref_link(wc):
+def get_species_ref_link(manifest_row):
     '''get species, ref_name, and path and return dictionary with this information.'''
-    ref_path = get_nhp_ref(wc)
+    ref_path = get_nhp_ref(manifest_row)
     ref_name = Path(ref_path).stem
-    return {'superpop' : wc.SUPRPOP, 'ref_name' : ref_name , 'ref_path' : ref_path}
+    return {'superpop' : manifest_row["superpop"], 'ref_name' : ref_name , 'ref_path' : ref_path}
