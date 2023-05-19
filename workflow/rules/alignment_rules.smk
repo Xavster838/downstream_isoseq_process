@@ -111,13 +111,13 @@ nhp_ref_dict = { r['superpop'] : r['ref_path'] for r in ref_link_list}
 
 def get_species_sample_ref_path(wc):
     '''given species sample combo, return reference fasta to index.'''
-    return nhp_ref_dict[wc['superpop']]
+    return nhp_ref_dict[wc['SPRPOP']]
 
 rule mm_index_nhp_ref:
     input:
         fasta = get_species_sample_ref_path,
     output:
-        mmi = "mmdb/{superpop}_{ref_name}_ref.mmi" # get_species_ref_path 
+        mmi = "mmdb/{SPRPOP}_{ref_name}_ref.mmi" # get_species_ref_path 
     wildcard_constraints:
         ref_name = "|".join( [Path(x).stem for x in manifest_df['reference']] )
     resources:
@@ -139,7 +139,7 @@ rule map_mm:
     benchmark:
         "benchmarks/{SMP}_{SPRPOP}_FILTERED_{frac}_{ref_name}.mm.bam.bench",
     wildcard_constraints:
-        ref_name = "|".join( [Path(x).stem for x in manifest['nhp_ref']] )
+        ref_name = "|".join( [Path(x).stem for x in manifest_df['reference']] )
     resources:
         mem_mb= 4000 , #lambda wildcards, attempt: 3 + 2 * attempt,
         mem_sw=lambda wildcards, attempt: 3 + 0 * attempt, # the mmi index is ~ 7Gb for a hg38
@@ -150,5 +150,5 @@ rule map_mm:
 {MMCMD} -t {threads} \
     {input.mmi} {input.fasta} | \
     samtools view -F 2052 -b - | \
-    samtools sort -T {TMPDIR}/{wildcards.SPRPOP}_{wildcards.SMP}_{wildcards.frac}_{wildcards.ref_name} -m {resources.mem_mb}M - > {output.bam}
+    samtools sort -T tmp/{wildcards.SPRPOP}_{wildcards.SMP}_{wildcards.frac}_{wildcards.ref_name} -m {resources.mem_mb}M - > {output.bam}
 """
