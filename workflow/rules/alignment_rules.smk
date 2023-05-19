@@ -106,7 +106,7 @@ rule mm_index_hg38:
 
 
 #get alignment to reference (NHP not T2T or hg38)
-ref_link_list = [ get_species_ref_link(cur_row) for i, cur_row in manifest.iterrows() ]
+ref_link_list = [ get_species_ref_link(cur_row) for i, cur_row in manifest_df.iterrows() ]
 nhp_ref_dict = { (r['species'], r['ref_name'] ) : r['ref_path'] for r in ref_link_list}
 
 def get_species_sample_ref_path(wc):
@@ -120,7 +120,7 @@ rule mm_index_nhp_ref:
     output:
         mmi = "mmdb/{ref_name}_ref.mmi" # get_species_ref_path 
     wildcard_constraints:
-        ref_name = "|".join( [Path(x).stem for x in manifest['nhp_ref']] )
+        ref_name = "|".join( [Path(x).stem for x in manifest_df['nhp_ref']] )
     resources:
         mem_mb = 10000
     threads:4
