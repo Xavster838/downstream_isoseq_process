@@ -125,9 +125,5 @@ rule mm_index_nhp_ref:
         mem_mb = 10000
     threads:4
     shell:"""
-if [[ {input.fasta} -ef {Hsa_ref} ]]; then 
-    ln -s {input.human_mmi} {output.mmi}
-else
     {MMCMD} -t {threads} -d {output.mmi} {input.fasta}
-fi
 """
