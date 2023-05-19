@@ -64,3 +64,42 @@ rule split_fastq:
                 end = int(  (idx + 1)*nrecs/nouts)
                 print(start, end, nrecs)
                 SeqIO.write(recs[start:end], out, "fastq")
+
+MMCMD = "minimap2 -ax splice --sam-hit-only --secondary=yes -p 0.8 --eqx -K 2G"
+
+Hsa_ref = config['Hsa_ref']
+t2t_ref = config['T2T_ref']
+
+rule mm_index_t2t:
+    input:
+        fasta = t2t_ref
+    output:
+        mmi = "mmdb/{t2t_version}_ref.mmi",
+    resources:
+        mem_mb=8000
+    conda:
+        "../envs/alignment.yml"
+    log:
+        "logs/T2T_index.log"
+    wildcard_constraints:
+        t2t_version = Path(config['T2T_ref']).stem
+    threads: 4
+    shell:"""
+{MMCMD} -t {threads} -d {output.mmi} {input.fasta}
+"""
+
+rule mm_index_hg38:
+    input:
+        fasta = Hsa_ref
+    output:
+        mmi = "mmdb/hg38_ref.mmi",
+    resources:
+        mem_mb=8000
+    conda:
+        "../envs/alignment.yml"
+    log:
+        "logs/hg38_index.log"
+    threads:4
+    shell:"""
+{MMCMD} -t {threads} -d {output.mmi} {input.fasta}
+"""
