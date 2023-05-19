@@ -4,9 +4,9 @@ def get_flnc(wc):
   return manifest_df.loc[wc.SMP].isoseq_flnc
 
 #functions to process and get information about NHP reference.
-def get_nhp_ref(wc):
+def get_nhp_ref(manifest_row):
     '''given sample species combo, get nhp_ref path'''
-    return manifest_df.loc[wc.SMP].reference #need to use list indexing for sample variable because sample is a function of dataframes.
+    return manifest_row.reference #need to use list indexing for sample variable because sample is a function of dataframes.
 
 def get_species_ref_link(wc):
     '''get species, ref_name, and path and return dictionary with this information.'''
