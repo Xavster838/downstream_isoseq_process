@@ -8,8 +8,7 @@ dependencies:
   - seqkit
   - biopython
   - regex
-  - glob
+  - glob2
   - pandas
   - numpy
   - pathlib
-  - tempfile
