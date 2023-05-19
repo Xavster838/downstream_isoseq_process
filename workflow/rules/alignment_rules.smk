@@ -213,3 +213,42 @@ rule mergeBams_t2t:
 samtools merge -@ {threads} {output.bam} {input.bams}
 samtools index -@ {threads} {output.bam}
 """
+
+
+#map isoseq to T2T
+rule map_mm_t2t:
+    input:
+        fasta = "tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_{frac}.fastq",  #rules.split_fastq.output.fastq , #"iso_fastqs/{species}/{sample}/{species}_{sample}_{frac}.fastq" ,  #"iso_fastas/{species}/{read}_{frac}.fasta",
+        mmi = "mmdb/hg38_ref.mmi" 
+    output:
+        bam = temp("tmp/alignments/hg38/{SMP}_{SPRPOP}_FILTERED_{frac}_hg38.mm.bam"),
+    benchmark:
+        "benchmarks/{SMP}_{SPRPOP}_FILTERED_{frac}_hg38.mm.bam.bench",
+    resources:
+        mem_mb= 4000 , #lambda wildcards, attempt: 3 + 2 * attempt,
+        mem_sw=lambda wildcards, attempt: 3 + 0 * attempt, # the mmi index is ~ 7Gb for a hg38
+    conda:
+        "../envs/alignment.yml"
+    threads: 8
+    shell:"""
+{MMCMD} -t {threads} \
+    {input.mmi} {input.fasta} | \
+    samtools view -F 2052 -b - | \
+    samtools sort -T tmp/{wildcards.SPRPOP}_{wildcards.SMP}_{wildcards.frac}_{wildcards.t2t_version} -m {resources.mem_mb}M - > {output.bam}
+"""
+
+rule mergeBams_hg38:
+    input:
+        bams = expand("tmp/alignments/hg38/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_hg38.mm.bam" , frac = fracIDs) #"alignments/{{species}}/reads{{read}}_{frac}.mm.bam", frac=fracIDs),
+    output:
+        bam= "alignments/hg38/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
+        bai= "alignments/hg38/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
+    resources:
+        mem_mb = 8000 #lambda wildcards, attempt: 8 + 8 * attempt,
+    conda:
+        "../envs/alignment.yml"
+    threads: 4
+    shell:"""
+samtools merge -@ {threads} {output.bam} {input.bams}
+samtools index -@ {threads} {output.bam}
+"""
