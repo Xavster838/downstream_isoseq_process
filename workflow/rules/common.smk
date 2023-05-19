@@ -13,3 +13,11 @@ def get_species_ref_link(manifest_row):
     ref_path = get_nhp_ref(manifest_row)
     ref_name = Path(ref_path).stem
     return {'superpop' : manifest_row["superpop"], 'ref_name' : ref_name , 'ref_path' : ref_path}
+
+
+def get_species_ref_path(wc):
+    '''given sample species combo, return all nhp_ref mmi_index to use as reference'''
+    ref_mmi_string = "mmdb/{superpop}/{ref_name}_ref.mmi"
+    ref_dict = get_species_ref_link(manifest_df[ wc['sample'] ])
+    ref_out_name = ref_mmi_string.format(superpop = ref_dict['superpop'], ref_name = ref_dict['ref_name'])
+    return ref_out_name
