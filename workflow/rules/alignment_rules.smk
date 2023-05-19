@@ -128,3 +128,27 @@ rule mm_index_nhp_ref:
     shell:"""
     {MMCMD} -t {threads} -d {output.mmi} {input.fasta}
 """
+
+#map isoseq to nhp reference
+rule map_mm:
+    input:
+        fasta = "tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_{frac}.fastq",  #rules.split_fastq.output.fastq , #"iso_fastqs/{species}/{sample}/{species}_{sample}_{frac}.fastq" ,  #"iso_fastas/{species}/{read}_{frac}.fasta",
+        mmi = get_species_ref_path 
+    output:
+        bam = temp("tmp/alignments/{SMP}_{SPRPOP}_FILTERED_{frac}_{ref_name}.mm.bam"),
+    benchmark:
+        "benchmarks/{SMP}_{SPRPOP}_FILTERED_{frac}_{ref_name}.mm.bam.bench",
+    wildcard_constraints:
+        ref_name = "|".join( [Path(x).stem for x in manifest['nhp_ref']] )
+    resources:
+        mem_mb= 4000 , #lambda wildcards, attempt: 3 + 2 * attempt,
+        mem_sw=lambda wildcards, attempt: 3 + 0 * attempt, # the mmi index is ~ 7Gb for a hg38
+    conda:
+        "../envs/alignment.yml"
+    threads: 8
+    shell:"""
+{MMCMD} -t {threads} \
+    {input.mmi} {input.fasta} | \
+    samtools view -F 2052 -b - | \
+    samtools sort -T {TMPDIR}/{wildcards.SPRPOP}_{wildcards.SMP}_{wildcards.frac}_{wildcards.ref_name} -m {resources.mem_mb}M - > {output.bam}
+"""
