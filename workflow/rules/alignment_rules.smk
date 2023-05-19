@@ -152,3 +152,21 @@ rule map_mm:
     samtools view -F 2052 -b - | \
     samtools sort -T tmp/{wildcards.SPRPOP}_{wildcards.SMP}_{wildcards.frac}_{wildcards.ref_name} -m {resources.mem_mb}M - > {output.bam}
 """
+
+rule mergeBams:
+    input:
+        bams = expand("tmp/alignments/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{ref_name}}.mm.bam" , frac = fracIDs) #"alignments/{{species}}/reads{{read}}_{frac}.mm.bam", frac=fracIDs),
+    output:
+        bam= "alignments/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
+        bai= "alignments/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
+    resources:
+        mem_mb = 8000 #lambda wildcards, attempt: 8 + 8 * attempt,
+    conda:
+        "../envs/alignment.yml"
+    wildcard_constraints:
+        ref_name = "|".join( [Path(x).stem for x in manifest_df['reference']] )
+    threads: 4
+    shell:"""
+samtools merge -@ {threads} {output.bam} {input.bams}
+samtools index -@ {threads} {output.bam}
+"""
