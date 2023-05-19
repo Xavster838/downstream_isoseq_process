@@ -111,18 +111,19 @@ nhp_ref_dict = { r['superpop'] : r['ref_path'] for r in ref_link_list}
 
 def get_species_sample_ref_path(wc):
     '''given species sample combo, return reference fasta to index.'''
-    return nhp_ref_dict[wc['species'], wc['ref_name']]
+    return nhp_ref_dict[wc['superpop']]
 
 rule mm_index_nhp_ref:
     input:
         fasta = get_species_sample_ref_path,
-        human_mmi = rules.mm_index_t2t.output.mmi
     output:
-        mmi = "mmdb/{ref_name}_ref.mmi" # get_species_ref_path 
+        mmi = "mmdb/{superpop}_{ref_name}_ref.mmi" # get_species_ref_path 
     wildcard_constraints:
-        ref_name = "|".join( [Path(x).stem for x in manifest_df['nhp_ref']] )
+        ref_name = "|".join( [Path(x).stem for x in manifest_df['reference']] )
     resources:
         mem_mb = 10000
+    conda:
+        "../envs/alignment.yml"
     threads:4
     shell:"""
     {MMCMD} -t {threads} -d {output.mmi} {input.fasta}
