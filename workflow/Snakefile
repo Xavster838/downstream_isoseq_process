@@ -39,6 +39,25 @@ if TEMP_DIR != "temp":
         shell("ln -s {TEMP_DIR} temp")
 
 
+rule get_all_ref_bams:
+    input: 
+        out_bams = get_all_ref_alignments
+
+rule get_all_t2t_bams:
+    input:
+        out_bams = get_all_t2t_alignments
+
+rule get_all_hg38_bams:
+    input:
+        out_bams = get_all_hg38_alignments
+
+rule get_all:
+    input:
+        nhp_bams = get_all_nhp_alignments, #rules.get_all_nhp_bams.input.out_bams,
+        t2t_bams = get_all_t2t_alignments, #rules.get_all_t2t_bams.input.out_bams,
+        hg38_bams = get_all_hg38_alignments #rules.get_all_hg38_bams.input.out_bams
+
+
 rule all:
     input:
        tmp_fastqs = [f"tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_2.fastq" for SMP, SPRPOP in list(zip(manifest_df["sample"] , manifest_df["superpop"])) ]
