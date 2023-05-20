@@ -216,7 +216,7 @@ samtools index -@ {threads} {output.bam}
 
 
 #map isoseq to T2T
-rule map_mm_t2t:
+rule map_mm_hg38:
     input:
         fasta = "tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_{frac}.fastq",  #rules.split_fastq.output.fastq , #"iso_fastqs/{species}/{sample}/{species}_{sample}_{frac}.fastq" ,  #"iso_fastas/{species}/{read}_{frac}.fasta",
         mmi = "mmdb/hg38_ref.mmi" 
@@ -234,7 +234,7 @@ rule map_mm_t2t:
 {MMCMD} -t {threads} \
     {input.mmi} {input.fasta} | \
     samtools view -F 2052 -b - | \
-    samtools sort -T tmp/{wildcards.SPRPOP}_{wildcards.SMP}_{wildcards.frac}_{wildcards.t2t_version} -m {resources.mem_mb}M - > {output.bam}
+    samtools sort -T tmp/{wildcards.SPRPOP}_{wildcards.SMP}_{wildcards.frac}_hg38 -m {resources.mem_mb}M - > {output.bam}
 """
 
 rule mergeBams_hg38:
