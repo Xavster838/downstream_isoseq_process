@@ -21,3 +21,23 @@ def get_species_ref_path(wc):
     ref_dict = get_species_ref_link(manifest_df.loc[ wc['SMP'] ])
     ref_out_name = ref_mmi_string.format(superpop = ref_dict['superpop'], ref_name = ref_dict['ref_name'])
     return ref_out_name
+
+
+def get_all_ref_alignments(wc):
+    '''get all sample reference defined alignment mergeBams outputs for files in manifest'''
+    output_string = "alignments/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam"
+    out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"],ref_name = Path(cur_row["nhp_ref"]).stem  ) for i, cur_row in manifest_df.iterrows()]
+    return out_paths
+
+def get_all_t2t_alignments(wc):
+    '''get all t2t mergeBams ouputs for files in manifest'''
+    t2t_version = Path(config['T2T_ref']).stem
+    output_string = "alignments/t2t/{SMP}_{SPRPOP}_FILTERED_{t2t_version}.mm.bam"
+    out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"] ,t2t_version = t2t_version ) for i, cur_row in manifest_df.iterrows()]
+    return out_paths
+
+def get_all_hg38_alignments(wc):
+    '''get all t2t mergeBams ouputs for files in manifest'''
+    output_string = "alignments/hg38/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam"
+    out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"]) for i, cur_row in manifest_df.iterrows()]
+    return out_paths
