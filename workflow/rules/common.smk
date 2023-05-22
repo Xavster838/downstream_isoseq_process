@@ -26,7 +26,7 @@ def get_species_ref_path(wc):
 def get_all_ref_alignments(wc):
     '''get all sample reference defined alignment mergeBams outputs for files in manifest'''
     output_string = "alignments/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam"
-    out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"],ref_name = Path(cur_row["nhp_ref"]).stem  ) for i, cur_row in manifest_df.iterrows()]
+    out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"],ref_name = Path(cur_row["reference"]).stem  ) for i, cur_row in manifest_df.iterrows()]
     return out_paths
 
 def get_all_t2t_alignments(wc):
