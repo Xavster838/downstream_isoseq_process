@@ -53,7 +53,7 @@ rule get_all_hg38_bams:
 
 rule get_all:
     input:
-        nhp_bams = get_all_nhp_alignments, #rules.get_all_nhp_bams.input.out_bams,
+        nhp_bams = get_all_ref_alignments, #rules.get_all_nhp_bams.input.out_bams,
         t2t_bams = get_all_t2t_alignments, #rules.get_all_t2t_bams.input.out_bams,
         hg38_bams = get_all_hg38_alignments #rules.get_all_hg38_bams.input.out_bams
 
