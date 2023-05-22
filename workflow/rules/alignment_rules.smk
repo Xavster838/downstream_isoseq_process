@@ -161,18 +161,19 @@ rule mergeBams:
         bai= "alignments/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
     resources:
         mem_mb = 8000 #lambda wildcards, attempt: 8 + 8 * attempt,
-#    conda:
-#        "../envs/alignment.yml"
+    conda:
+        "../envs/alignment.yml"
     wildcard_constraints:
         ref_name = "|".join( [Path(x).stem for x in manifest_df['reference']] )
     threads: 4
-    run:
-        if get_col_bam(wildcards.SMP):
-            shell("ln -s {input.bams} {output.bam}")
-        else:
-            shell("samtools merge -@ {threads} {output.bam} {input.bams}")
-        shell("samtools index -@ {threads} {output.bam}")
-        
+    shell:"""
+        if [ $(echo {input.bams} | wc -w)  -eq 1 ]; then
+            ln -s {input.bams} {output.bam}
+        else
+            samtools merge -@ {threads} {output.bam} {input.bams}
+        fi
+        samtools index -@ {threads} {output.bam}
+    """
 #     shell:"""
 # samtools merge -@ {threads} {output.bam} {input.bams}
 # samtools index -@ {threads} {output.bam}
