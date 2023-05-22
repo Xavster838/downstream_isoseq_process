@@ -155,7 +155,7 @@ rule map_mm:
 
 rule mergeBams:
     input:
-        bams = expand("tmp/alignments/{{ref_name}}/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{ref_name}}.mm.bam" , frac = fracIDs) #"alignments/{{species}}/reads{{read}}_{frac}.mm.bam", frac=fracIDs),
+        bams = get_nhp_ref_input #expand("tmp/alignments/{{ref_name}}/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{ref_name}}.mm.bam" , frac = fracIDs)
     output:
         bam= "alignments/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
         bai= "alignments/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
@@ -166,10 +166,17 @@ rule mergeBams:
     wildcard_constraints:
         ref_name = "|".join( [Path(x).stem for x in manifest_df['reference']] )
     threads: 4
-    shell:"""
-samtools merge -@ {threads} {output.bam} {input.bams}
-samtools index -@ {threads} {output.bam}
-"""
+    run:
+        if get_col_bam(wildcards.SMP):
+            shell("ln -s {input.bams} {output.bam}")
+        else:
+            shell("samtools merge -@ {threads} {output.bam} {input.bams}")
+        shell("samtools index -@ {threads} {output.bam}")
+        
+#     shell:"""
+# samtools merge -@ {threads} {output.bam} {input.bams}
+# samtools index -@ {threads} {output.bam}
+# """
 
 
 #map isoseq to T2T
