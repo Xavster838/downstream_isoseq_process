@@ -41,3 +41,37 @@ def get_all_hg38_alignments(wc):
     output_string = "alignments/hg38/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam"
     out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"]) for i, cur_row in manifest_df.iterrows()]
     return out_paths
+
+  
+def get_col_bam(cur_sample , alignment_type = "sample_reference"):
+    '''given a merge rule, check if manifest.df already has an alignment bam for the given alignment or return False if not.'''        
+    if alignment_type == 'sample_reference':
+        aln_col = "isoseq_ref_aligned_bam"
+        out_bam_str = get_ref_name(cur_sample)
+    elif alignment_type == "T2T":
+        aln_col = "isoseq_T2T_aligned_bam"
+        out_ref_str = Path(config['T2T_ref']).stem
+    elif alignment_type == "hg38":
+        aln_col = "isoseq_hg38_aligned_bam"
+        out_ref_str = "hg38"
+    else:
+        raise ValueError(f"Invalid alignment_type argument: can only be either: ['sample_reference', 'T2T', 'hg38']: passed: {alignment_type} ")
+    cur_aln_path = manifest_df.loc[cur_sample][aln_col]
+    if isinstance( cur_aln_path, str ):
+        if(os.path.exists(cur_aln_path)):
+            if( os.path.splitext(cur_aln_path)[1] == ".bam" ):
+                return cur_aln_path
+            else:
+                print(f"file in {aln_col} column for sample {cur_sample} in manifest not of type bam... generating alignments.")
+        else:
+            print(f"file path in {aln_col} column for sample {cur_sample} in manifest not found... generating alignments.")
+    else:
+        print(f"not seeing file passed for sample {cur_sample} in column {aln_col} for manifest... generating alignments")
+    return False
+
+def get_nhp_ref_input( cur_sample ):
+    '''figure out if previous sample reference bam exists and return that or expanded sub bams of fracIDs.'''
+    ref_name = Path(manifest_df.loc[cur_sample]["reference"]).stem
+    out_name = f"alignments/{ref_name}/{cur_sample}_{manifest_df.loc[cur_sample]['superpop']}_FILTERED_{ref_name}.mm.bam"
+    prev_aln = get_col_bam(cur_sample, alignment_type = "sample_reference")
+    return prev_aln or expand("tmp/alignments/{{ref_name}}/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{ref_name}}.mm.bam" , frac = fracIDs)
