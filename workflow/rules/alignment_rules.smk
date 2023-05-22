@@ -161,8 +161,8 @@ rule mergeBams:
         bai= "alignments/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
     resources:
         mem_mb = 8000 #lambda wildcards, attempt: 8 + 8 * attempt,
-    conda:
-        "../envs/alignment.yml"
+#    conda:
+#        "../envs/alignment.yml"
     wildcard_constraints:
         ref_name = "|".join( [Path(x).stem for x in manifest_df['reference']] )
     threads: 4
