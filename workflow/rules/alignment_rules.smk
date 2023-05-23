@@ -218,9 +218,13 @@ rule mergeBams_t2t:
         t2t_version = Path(config['T2T_ref']).stem
     threads: 4
     shell:"""
-samtools merge -@ {threads} {output.bam} {input.bams}
-samtools index -@ {threads} {output.bam}
-"""
+        if [ $(echo {input.bams} | wc -w)  -eq 1 ]; then
+            ln -s {input.bams} {output.bam}
+        else
+            samtools merge -@ {threads} {output.bam} {input.bams}
+        fi
+        samtools index -@ {threads} {output.bam}
+    """
 
 
 #map isoseq to T2T
