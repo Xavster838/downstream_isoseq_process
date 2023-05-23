@@ -157,8 +157,8 @@ rule mergeBams:
     input:
         bams = get_nhp_ref_input #expand("tmp/alignments/{{ref_name}}/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{ref_name}}.mm.bam" , frac = fracIDs)
     output:
-        bam= "alignments/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
-        bai= "alignments/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
+        bam= "alignments/{SMP}/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
+        bai= "alignments/{SMP}/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
     resources:
         mem_mb = 8000 #lambda wildcards, attempt: 8 + 8 * attempt,
     conda:
@@ -206,10 +206,10 @@ rule map_mm_t2t:
 
 rule mergeBams_t2t:
     input:
-        bams = expand("tmp/alignments/t2t/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{t2t_version}}.mm.bam" , frac = fracIDs) #"alignments/{{species}}/reads{{read}}_{frac}.mm.bam", frac=fracIDs),
+        bams = get_t2t_input 
     output:
-        bam= "alignments/t2t/{SMP}_{SPRPOP}_FILTERED_{t2t_version}.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
-        bai= "alignments/t2t/{SMP}_{SPRPOP}_FILTERED_{t2t_version}.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
+        bam= "alignments/{SMP}/t2t/{SMP}_{SPRPOP}_FILTERED_{t2t_version}.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
+        bai= "alignments/{SMP}/t2t/{SMP}_{SPRPOP}_FILTERED_{t2t_version}.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
     resources:
         mem_mb = 8000 #lambda wildcards, attempt: 8 + 8 * attempt,
     conda:
@@ -249,8 +249,8 @@ rule mergeBams_hg38:
     input:
         bams = expand("tmp/alignments/hg38/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_hg38.mm.bam" , frac = fracIDs) #"alignments/{{species}}/reads{{read}}_{frac}.mm.bam", frac=fracIDs),
     output:
-        bam= "alignments/hg38/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
-        bai= "alignments/hg38/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
+        bam= "alignments/{SMP}/hg38/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
+        bai= "alignments/{SMP}/hg38/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
     resources:
         mem_mb = 8000 #lambda wildcards, attempt: 8 + 8 * attempt,
     conda:
