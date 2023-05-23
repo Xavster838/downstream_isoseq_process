@@ -51,13 +51,10 @@ def get_col_bam(cur_sample , alignment_type = "sample_reference"):
     '''given a merge rule, check if manifest.df already has an alignment bam for the given alignment or return False if not.'''        
     if alignment_type == 'sample_reference':
         aln_col = "isoseq_ref_aligned_bam"
-        out_bam_str = get_nhp_ref_name( get_nhp_ref(manifest_df.loc[cur_sample]))
     elif alignment_type == "T2T":
         aln_col = "isoseq_T2T_aligned_bam"
-        out_ref_str = Path(config['T2T_ref']).stem
     elif alignment_type == "hg38":
         aln_col = "isoseq_hg38_aligned_bam"
-        out_ref_str = "hg38"
     else:
         raise ValueError(f"Invalid alignment_type argument: can only be either: ['sample_reference', 'T2T', 'hg38']: passed: {alignment_type} ")
     cur_aln_path = manifest_df.loc[cur_sample][aln_col]
@@ -76,7 +73,12 @@ def get_col_bam(cur_sample , alignment_type = "sample_reference"):
 def get_nhp_ref_input( wc ):
     '''figure out if previous sample reference bam exists and return that or expanded sub bams of fracIDs.'''
     cur_sample = wc.SMP    
-    ref_name = Path(manifest_df.loc[cur_sample]["reference"]).stem
-    out_name = f"alignments/{ref_name}/{cur_sample}_{ref_name}_FILTERED_{ref_name}.mm.bam"
     prev_aln = get_col_bam(cur_sample, alignment_type = "sample_reference")
     return prev_aln or expand("tmp/alignments/{{ref_name}}/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{ref_name}}.mm.bam" , frac = fracIDs)
+
+
+def get_t2t_input(wc):
+    '''figure out if previous T2T aligned bam exists and return that or expanded sub bams from splitting by fracIDs'''
+    cur_sample = wc.SMP
+    prev_aln = get_col_bam(cur_sample, alignment_type = "T2T")
+    return prev_aln or expand("tmp/alignments/{{SMP}}/t2t/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{t2t_version}}.mm.bam" , frac = fracIDs)
