@@ -82,3 +82,9 @@ def get_t2t_input(wc):
     cur_sample = wc.SMP
     prev_aln = get_col_bam(cur_sample, alignment_type = "T2T")
     return prev_aln or expand("tmp/alignments/{{SMP}}/t2t/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{t2t_version}}.mm.bam" , frac = fracIDs)
+
+def get_hg38_input(wc):
+    '''figure out if previous T2T aligned bam exists and return that or expanded sub bams from splitting by fracIDs'''
+    cur_sample = wc.SMP
+    prev_aln = get_col_bam(cur_sample, alignment_type = "hg38")
+    return prev_aln or expand("tmp/alignments/{{SMP}}/hg38/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_hg38.mm.bam" , frac = fracIDs)

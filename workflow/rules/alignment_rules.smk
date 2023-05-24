@@ -233,7 +233,7 @@ rule map_mm_hg38:
         fasta = "tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_{frac}.fastq",  #rules.split_fastq.output.fastq , #"iso_fastqs/{species}/{sample}/{species}_{sample}_{frac}.fastq" ,  #"iso_fastas/{species}/{read}_{frac}.fasta",
         mmi = "mmdb/hg38_ref.mmi" 
     output:
-        bam = temp("tmp/alignments/hg38/{SMP}_{SPRPOP}_FILTERED_{frac}_hg38.mm.bam"),
+        bam = temp("tmp/alignments/{SMP}/hg38/{SMP}_{SPRPOP}_FILTERED_{frac}_hg38.mm.bam"),
     benchmark:
         "benchmarks/{SMP}_{SPRPOP}_FILTERED_{frac}_hg38.mm.bam.bench",
     resources:
@@ -251,7 +251,7 @@ rule map_mm_hg38:
 
 rule mergeBams_hg38:
     input:
-        bams = expand("tmp/alignments/hg38/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_hg38.mm.bam" , frac = fracIDs) #"alignments/{{species}}/reads{{read}}_{frac}.mm.bam", frac=fracIDs),
+        bams = get_hg38_input 
     output:
         bam= "alignments/{SMP}/hg38/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
         bai= "alignments/{SMP}/hg38/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
@@ -261,6 +261,10 @@ rule mergeBams_hg38:
         "../envs/alignment.yml"
     threads: 4
     shell:"""
-samtools merge -@ {threads} {output.bam} {input.bams}
-samtools index -@ {threads} {output.bam}
-"""
+        if [ $(echo {input.bams} | wc -w)  -eq 1 ]; then
+            ln -s {input.bams} {output.bam}
+        else
+            samtools merge -@ {threads} {output.bam} {input.bams}
+        fi
+        samtools index -@ {threads} {output.bam}
+    """
