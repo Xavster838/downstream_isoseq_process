@@ -186,7 +186,7 @@ rule map_mm_t2t:
         fasta = "tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_{frac}.fastq",  #rules.split_fastq.output.fastq , #"iso_fastqs/{species}/{sample}/{species}_{sample}_{frac}.fastq" ,  #"iso_fastas/{species}/{read}_{frac}.fasta",
         mmi = "mmdb/{t2t_version}_ref.mmi" 
     output:
-        bam = temp("tmp/alignments/t2t/{SMP}_{SPRPOP}_FILTERED_{frac}_{t2t_version}.mm.bam"),
+        bam = temp("tmp/alignments/{SMP}/t2t/{SMP}_{SPRPOP}_FILTERED_{frac}_{t2t_version}.mm.bam"),
     benchmark:
         "benchmarks/{SMP}_{SPRPOP}_FILTERED_{frac}_{t2t_version}.mm.bam.bench",
     wildcard_constraints:
