@@ -65,10 +65,15 @@ rule split_fastq:
                 print(start, end, nrecs)
                 SeqIO.write(recs[start:end], out, "fastq")
 
-MMCMD = "minimap2 -ax splice --sam-hit-only --secondary=yes -p 0.8 --eqx -K 2G"
 
 Hsa_ref = config['Hsa_ref']
 t2t_ref = config['T2T_ref']
+EXTRA_MMCMD = config['extra_minimap_flags'] if 'extra_minimap_flags' in config.keys() else "" #incase want to further specify minimap commands with splice size and other flags
+
+MMCMD = f"minimap2 -ax splice --sam-hit-only --secondary=yes -p 0.8 --eqx -K 2G {EXTRA_MMCMD}"
+
+
+
 
 rule mm_index_t2t:
     input:
