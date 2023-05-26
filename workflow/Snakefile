@@ -72,6 +72,23 @@ rule get_hg38_stats:
     input:
         stats = get_all_hg38_stats
 
+#collapse rules
+rule get_sample_ref_collapse:
+    '''get all stats for sample reference alignment bams'''
+    input:
+        stats = get_all_ref_collapse
+
+rule get_t2t_collapse:
+    '''get all stats for sample t2t alignment bams'''
+    input:
+        stats = get_all_t2t_collapse
+
+rule get_hg38_collapse:
+    '''get all stats for sample hg38 alignment bams'''
+    input:
+        stats = get_all_hg38_collapse
+
+
 rule all:
     input:
        tmp_fastqs = [f"tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_2.fastq" for SMP, SPRPOP in list(zip(manifest_df["sample"] , manifest_df["superpop"])) ]

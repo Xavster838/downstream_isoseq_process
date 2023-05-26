@@ -16,8 +16,24 @@ rule get_alignment_stats:
 rb stats {input.bam} > {output.stats}    
 """
 
-# rule collapse_to_isoforms:
-
+rule collapse_to_isoforms:
+    input:
+        bam = "alignments/{SMP}/{ref1}/{SMP}_{SPRPOP}_FILTERED_{ref2}.mm.bam"
+    output:
+        gff = "alignments/{SMP}/{ref1}/collapsed_gff/{SMP}_{SPRPOP}_FILTERED_{ref2}.mm.bam.collapsed.gff3"
+    log:
+        "logs/isoform_collapse/{SMP}_{SPRPOP}_FILTERED_{ref2}.collapse.log"
+    resources:
+        mem_mb = 4000
+    threads : 4
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
+    shell:"""
+isoseq3 collapse -j {threads} --log-file {log} {input.bam} {output.gff}
+"""
 
 # ####    locus specific
 # rule annotate_reference_locus:

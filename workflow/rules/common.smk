@@ -108,3 +108,23 @@ def get_all_hg38_stats(wc):
     output_string = "alignments/{SMP}/hg38/stats/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam.stats.tbl"
     out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"]) for i, cur_row in manifest_df.iterrows()]
     return out_paths
+
+#isoseq3 collapse
+def get_all_ref_collapse(wc):
+    '''get all sample reference defined alignment stat outputs for rule get_sample_ref_stats'''
+    output_string = "alignments/{SMP}/{ref_name}/collapsed_gff/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam.collapsed.gff3"
+    out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"],ref_name = Path(cur_row["reference"]).stem  ) for i, cur_row in manifest_df.iterrows()]
+    return out_paths
+
+def get_all_t2t_collapse(wc):
+    '''get all t2t mergeBams ouputs for files in manifest'''
+    t2t_version = Path(config['T2T_ref']).stem
+    output_string = "alignments/{SMP}/t2t/collapsed_gff/{SMP}_{SPRPOP}_FILTERED_{t2t_version}.mm.bam.collapsed.gff3"
+    out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"] ,t2t_version = t2t_version ) for i, cur_row in manifest_df.iterrows()]
+    return out_paths
+
+def get_all_hg38_collapse(wc):
+    '''get all hg38 mergeBams ouputs for files in manifest'''
+    output_string = "alignments/{SMP}/hg38/collapsed_gff/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam.collapsed.gff3"
+    out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"]) for i, cur_row in manifest_df.iterrows()]
+    return out_paths
