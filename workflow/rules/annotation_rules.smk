@@ -10,7 +10,7 @@ rule get_alignment_stats:
     conda:
         "../envs/annotation.yml"
     wildcard_constraints:
-        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] )
+        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
     shell:"""
 rb stats {input.bam} > {output.stats}    
