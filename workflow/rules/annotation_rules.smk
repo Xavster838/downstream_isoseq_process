@@ -16,18 +16,6 @@ rule get_alignment_stats:
 rb stats {input.bam} > {output.stats}    
 """
 
-rule get_sample_ref_stats:
-    input:
-        stats = get_all_ref_stats
-
-rule get_t2t_stats:
-    input:
-        stats = get_all_t2t_stats
-
-rule get_hg38_stats:
-    input:
-        stats = get_all_hg38_stats
-
 # rule collapse_to_isoforms:
 
 

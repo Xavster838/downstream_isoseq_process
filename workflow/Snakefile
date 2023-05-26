@@ -57,6 +57,20 @@ rule get_all:
         t2t_bams = get_all_t2t_alignments, #rules.get_all_t2t_bams.input.out_bams,
         hg38_bams = get_all_hg38_alignments #rules.get_all_hg38_bams.input.out_bams
 
+rule get_sample_ref_stats:
+    '''get all stats for sample reference alignment bams'''
+    input:
+        stats = get_all_ref_stats
+
+rule get_t2t_stats:
+    '''get all stats for sample t2t alignment bams'''
+    input:
+        stats = get_all_t2t_stats
+
+rule get_hg38_stats:
+    '''get all stats for sample hg38 alignment bams'''
+    input:
+        stats = get_all_hg38_stats
 
 rule all:
     input:
