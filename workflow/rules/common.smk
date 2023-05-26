@@ -46,7 +46,7 @@ def get_all_hg38_alignments(wc):
     out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"]) for i, cur_row in manifest_df.iterrows()]
     return out_paths
 
-  
+
 def get_col_bam(cur_sample , alignment_type = "sample_reference"):
     '''given a merge rule, check if manifest.df already has an alignment bam for the given alignment or return False if not.'''        
     if alignment_type == 'sample_reference':
@@ -88,3 +88,23 @@ def get_hg38_input(wc):
     cur_sample = wc.SMP
     prev_aln = get_col_bam(cur_sample, alignment_type = "hg38")
     return prev_aln or expand("tmp/alignments/{{SMP}}/hg38/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_hg38.mm.bam" , frac = fracIDs)
+
+
+def get_all_ref_stats(wc):
+    '''get all sample reference defined alignment stat outputs for rule get_sample_ref_stats'''
+    output_string = "alignments/{SMP}/{ref_name}/stats/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam.stats.tbl"
+    out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"],ref_name = Path(cur_row["reference"]).stem  ) for i, cur_row in manifest_df.iterrows()]
+    return out_paths
+
+def get_all_t2t_stats(wc):
+    '''get all t2t mergeBams ouputs for files in manifest'''
+    t2t_version = Path(config['T2T_ref']).stem
+    output_string = "alignments/{SMP}/t2t/stats/{SMP}_{SPRPOP}_FILTERED_{t2t_version}.mm.bam.stats.tbl"
+    out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"] ,t2t_version = t2t_version ) for i, cur_row in manifest_df.iterrows()]
+    return out_paths
+
+def get_all_hg38_stats(wc):
+    '''get all hg38 mergeBams ouputs for files in manifest'''
+    output_string = "alignments/{SMP}/hg38/stats/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam.stats.tbl"
+    out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"]) for i, cur_row in manifest_df.iterrows()]
+    return out_paths

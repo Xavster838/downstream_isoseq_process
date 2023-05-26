@@ -1,0 +1,11 @@
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - pandas
+  - biopython 
+  - rustybam
+  - isoseq3
+  
