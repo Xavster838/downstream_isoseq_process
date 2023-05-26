@@ -20,9 +20,9 @@ rule collapse_to_isoforms:
     input:
         bam = "alignments/{SMP}/{ref1}/{SMP}_{SPRPOP}_FILTERED_{ref2}.mm.bam"
     output:
-        gff = "alignments/{SMP}/{ref1}/collapsed_gff/{SMP}_{SPRPOP}_FILTERED_{ref2}.mm.bam.collapsed.gff3"
+        gff = "alignments/{SMP}/{ref1}/collapsed_gff/{SMP}_{SPRPOP}_FILTERED_{ref2}.mm.bam.collapsed.gff"
     log:
-        "logs/isoform_collapse/{SMP}_{SPRPOP}_FILTERED_{ref2}.collapse.log"
+        "logs/isoform_collapse/{SMP}_{SPRPOP}_FILTERED_{ref1}_{ref2}.collapse.log"
     resources:
         mem_mb = 4000
     threads : 4
