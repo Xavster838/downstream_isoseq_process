@@ -128,3 +128,11 @@ def get_all_hg38_collapse(wc):
     output_string = "alignments/{SMP}/hg38/collapsed_gff/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam.collapsed.gff"
     out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"]) for i, cur_row in manifest_df.iterrows()]
     return out_paths
+      kj dsal;kj as,dkdkdk
+
+def get_loc_path(wc):
+    '''given a locus name, identify the path in the config variable ref_map_fasta that contains the sequence to that locus'''
+    if "ref_map_loci" in config.keys():
+        if wc.loc_name in config["ref_map_loci"].keys():
+            return config["ref_map_loci"][wc.loc_name]
+    return None

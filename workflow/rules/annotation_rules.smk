@@ -36,8 +36,26 @@ isoseq3 collapse -j {threads} --log-file {log} {input.bam} {output.gff}
 """
 
 # ####    locus specific
-# rule annotate_reference_locus:
-#     '''given a sequence, map and identify regions on the reference corresponding to that sequence'''
+rule annotate_reference_locus:
+    '''given a sequence, map and identify regions on the reference corresponding to that sequence'''
+    input:
+        ref = get_sample_reference
+    output:
+        temp_mapping_psl = temp( "tmp/ref_mappings/{LOC}/{REF}" ),
+        mapping_bed = "reference_annotations/{LOC}/{REF}__{LOC}_mappings.bed"
+    resources:
+        mem_mb = 4000
+    threads: 8
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        loc_seq = get_loc_path,
+        loc_name = "|".join( list(config["ref_map_loci"].keys() ) )
+    shell:"""
+blat -t=dna -q=dna -minScore=100 -maxIntron=500 -minMatch=3 {input.ref} {wildcards.loc_seq} {output.temp_mapping_psl}
+tail -n +6 {output.temp_mapping_psl} | cut -f14,16,17,10,9 | \
+    awk "BEGIN {{FS="\\t"; OFS="\\t"}} {{print \$3,\$4,\$5,"{wildcards.loc_name}",".",\$1}}" | bedtools sort > {output.mapping_bed}
+"""
 
 # rule subset_alignment_bam_by_locus:
 #     '''subset alignment bam to reads that overlap annotated regions by annotate_reference_locus'''
