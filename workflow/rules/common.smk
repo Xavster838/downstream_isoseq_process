@@ -136,3 +136,8 @@ def get_loc_path(wc):
         if wc.loc_name in config["ref_map_loci"].keys():
             return config["ref_map_loci"][wc.loc_name]
     return None
+
+def get_sample_reference(wc):
+    '''given a reference name, like CHM13 or Jim_h1, return the path to that reference identified by one of the samples in the manifest'''
+    return [ref_path for ref_path in manifest_df["reference"] if get_nhp_ref_name( ref_path ) == wc.ref ][0]
+
