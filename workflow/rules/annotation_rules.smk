@@ -39,18 +39,19 @@ isoseq3 collapse -j {threads} --log-file {log} {input.bam} {output.gff}
 rule annotate_reference_locus:
     '''given a sequence, map and identify regions on the reference corresponding to that sequence'''
     input:
-        ref = get_sample_reference
+        ref = get_sample_reference,
+        loc_seq = get_loc_path,
     output:
-        temp_mapping_psl = temp( "tmp/ref_mappings/{LOC}/{REF}" ),
-        mapping_bed = "reference_annotations/{LOC}/{REF}__{LOC}_mappings.bed"
+        temp_mapping_psl = temp( "tmp/ref_mappings/{loc_name}/{ref}" ),
+        mapping_bed = "reference_annotations/{loc_name}/{ref}__{loc_name}_mappings.bed"
     resources:
         mem_mb = 4000
     threads: 8
     conda:
         "../envs/annotation.yml"
     wildcard_constraints:
-        loc_seq = get_loc_path,
-        loc_name = "|".join( list(config["ref_map_loci"].keys() ) )
+        loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
+        ref = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] )
     shell:"""
 blat -t=dna -q=dna -minScore=100 -maxIntron=500 -minMatch=3 {input.ref} {wildcards.loc_seq} {output.temp_mapping_psl}
 tail -n +6 {output.temp_mapping_psl} | cut -f14,16,17,10,9 | \
