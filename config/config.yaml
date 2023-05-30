@@ -4,3 +4,4 @@ T2T_ref : /net/eichler/vol26/projects/chm13_t2t/nobackups/assemblies/T2T-CHM13v2
 min_read_length : 1000
 min_read_quality : 30
 extra_minimap_flags : "" #"-G 20k"
+ref_map_loci : {"TBC1D3" : "/net/eichler/vol26/home/guitarfx/universally_useful_data/TBC1D3/TBC1D3L_sequence_exonUPPER.fa"} #paralog or sequence to map in an assembly 
