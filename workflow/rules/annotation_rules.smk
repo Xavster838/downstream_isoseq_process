@@ -54,7 +54,7 @@ rule annotate_reference_locus:
         ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
         ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] ),
     shell:"""
-blat -t=dna -q=dna -minScore=100 -maxIntron=500 -minMatch=3 {input.ref2} {input.loc_seq} {output.temp_mapping_psl}
+blat -t=dna -q=dna -minScore=100 -maxIntron=500 -minMatch=3 {input.ref} {input.loc_seq} {output.temp_mapping_psl}
 tail -n +6 {output.temp_mapping_psl} | cut -f14,16,17,10,9 | \
     awk 'BEGIN {{FS="\\t"; OFS="\\t"}} {{print $3,$4,$5,"{wildcards.loc_name}",".",$1}}' | bedtools sort > {output.mapping_bed}
 """
