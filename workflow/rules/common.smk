@@ -138,5 +138,5 @@ def get_loc_path(wc):
 
 def get_sample_reference(wc):
     '''given a reference name, like CHM13 or Jim_h1, return the path to that reference identified by one of the samples in the manifest'''
-    return [ref_path for ref_path in manifest_df["reference"] if get_nhp_ref_name( ref_path ) == wc.ref ][0]
+    return [ref_path for ref_path in manifest_df["reference"] if get_nhp_ref_name( ref_path ) == wc.ref2 ][0]
 
