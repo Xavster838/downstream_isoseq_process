@@ -8,6 +8,7 @@ dependencies:
   - biopython 
   - rustybam
   - isoseq3
+  - libzlib=1.2.11
   - blat=36
-  - bedtools=2.31.0
-  - samtools=1.17  
+  - bedtools #=2.31.0
+  - samtools #=1.17  
