@@ -42,8 +42,8 @@ rule annotate_reference_locus:
         ref = get_sample_reference,
         loc_seq = get_loc_path,
     output:
-        temp_mapping_psl = temp( "tmp/ref_mappings/{loc_name}/{ref2}" ),
-        mapping_bed = "reference_annotations/{loc_name}/{ref2}__{loc_name}_mappings.bed"
+        temp_mapping_psl = temp( "tmp/ref_mappings/{loc_name}/{ref1}/{ref2}__{loc_name}.psl" ),
+        mapping_bed = "reference_annotations/{loc_name}/{ref1}/{ref2}__{loc_name}_mappings.bed"
     resources:
         mem_mb = 4000
     threads: 4
@@ -51,6 +51,7 @@ rule annotate_reference_locus:
         "../envs/annotation.yml"
     wildcard_constraints:
         loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
+        ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
         ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] ),
     shell:"""
 blat -t=dna -q=dna -minScore=100 -maxIntron=500 -minMatch=3 {input.ref2} {input.loc_seq} {output.temp_mapping_psl}
