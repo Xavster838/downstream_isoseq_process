@@ -59,8 +59,27 @@ tail -n +6 {output.temp_mapping_psl} | cut -f14,16,17,10,9 | \
     awk 'BEGIN {{FS="\\t"; OFS="\\t"}} {{print $3,$4,$5,"{wildcards.loc_name}",".",$1}}' | bedtools sort > {output.mapping_bed}
 """
 
-# rule subset_alignment_bam_by_locus:
-#     '''subset alignment bam to reads that overlap annotated regions by annotate_reference_locus'''
+rule subset_alignment_bam_by_locus:
+    '''subset alignment bam to reads that overlap annotated regions by annotate_reference_locus'''
+    input:
+        bam = "alignments/{SMP}/{ref1}/{SMP}_{SPRPOP}_FILTERED_{ref2}.mm.bam",
+        ref_loc_bed = "reference_annotations/{loc_name}/{ref1}/{ref2}__{loc_name}_mappings.bed"
+    output:
+        bam = "alignments/{loc_name}/{SMP}/{SMP}__{ref1}_{ref2}__{loc_name}_mappings.bam"
+        bai = "alignments/{loc_name}/{SMP}/{SMP}__{ref1}_{ref2}__{loc_name}_mappings.bam.bai"
+    resources: 
+        mem_mb = 8000
+    threads: 2
+    wildcard_constraints:
+        loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
+        ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] )
+    conda:
+        "../envs/annotation.yml"
+    shell:"""
+bedtools intersect -abam {input.bam} -b {input.ref_loc_bed} | samtools sort > {output.subset_bam} 
+samtools index {output.subset_bam}
+"""
 
 # rule get_locus_alignment_stats:
 #     '''get alignment stats for reads subset by rule subset_alignemnt_bam_by_locus'''
