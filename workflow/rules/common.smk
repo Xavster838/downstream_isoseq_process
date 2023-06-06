@@ -74,7 +74,9 @@ def get_nhp_ref_input( wc ):
     '''figure out if previous sample reference bam exists and return that or expanded sub bams of fracIDs.'''
     cur_sample = wc.SMP    
     prev_aln = get_col_bam(cur_sample, alignment_type = "sample_reference")
-    return prev_aln or expand("tmp/alignments/{{ref_name}}/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{ref_name}}.mm.bam" , frac = fracIDs)
+    if not prev_aln:
+        return expand("tmp/alignments/{{ref_name}}/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{ref_name}}.mm.bam" , frac = fracIDs)
+    return prev_aln
 
 
 def get_t2t_input(wc):
