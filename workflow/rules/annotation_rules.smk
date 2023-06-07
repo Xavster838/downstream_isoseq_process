@@ -81,8 +81,25 @@ bedtools intersect -abam {input.bam} -b {input.ref_loc_bed} | samtools sort > {o
 samtools index {output.bam}
 """
 
-# rule get_locus_alignment_stats:
-#     '''get alignment stats for reads subset by rule subset_alignemnt_bam_by_locus'''
+rule get_locus_alignment_stats:
+    '''get alignment stats for reads subset by rule subset_alignemnt_bam_by_locus'''
+    input:
+        bam = "alignments/{SMP}/{ref1}/{SMP}_{SPRPOP}_FILTERED_{ref2}.mm.bam",
+    output:
+        stats = ""
+    resources:
+        mem_mb = 8000
+    threads: 2
+    wildcard_constraints:
+        loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
+        ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] )
+    conda:
+        "../envs/annotation.yml"
+    shell:"""
+    rb stats {input.bam}
+"""
+
 
 # rule visualize_locus_dot_plots:
 #     '''visualize alignment stats of a locus from rule get_locus_alignment_stats'''
