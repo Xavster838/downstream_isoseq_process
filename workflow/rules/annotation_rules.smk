@@ -84,9 +84,9 @@ samtools index {output.bam}
 rule get_locus_alignment_stats:
     '''get alignment stats for reads subset by rule subset_alignemnt_bam_by_locus'''
     input:
-        bam = "alignments/{SMP}/{ref1}/{SMP}_{SPRPOP}_FILTERED_{ref2}.mm.bam",
+        locus_bam = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_mappings.bam",
     output:
-        stats = ""
+        stats = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_mappings.bam.stats.tbl"
     resources:
         mem_mb = 8000
     threads: 2
