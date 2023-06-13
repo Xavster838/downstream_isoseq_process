@@ -112,11 +112,11 @@ rule mm_index_hg38:
 
 #get alignment to reference (NHP not T2T or hg38)
 ref_link_list = [ get_species_ref_link(cur_row) for i, cur_row in manifest_df.iterrows() ]
-nhp_ref_dict = { r['superpop'] : r['ref_path'] for r in ref_link_list}
+nhp_ref_dict = { r['ref_name'] : r['ref_path'] for r in ref_link_list}
 
 def get_species_sample_ref_path(wc):
     '''given species sample combo, return reference fasta to index.'''
-    return nhp_ref_dict[wc['SPRPOP']]
+    return nhp_ref_dict[wc['ref_name']]
 
 rule mm_index_nhp_ref:
     input:
