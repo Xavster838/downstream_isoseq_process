@@ -97,7 +97,7 @@ rule get_locus_alignment_stats:
     conda:
         "../envs/annotation.yml"
     shell:"""
-    rb stats {input.bam}
+    rb stats {input.locus_bam}
 """
 
 
