@@ -112,6 +112,18 @@ rule get_locus_alignment_stats:
 # rule visualize_locus_isoform_support:
 #     '''plot collapsed isoforms and dense alignments beneath'''
 
+rule merge_locus_gff_info:
+    '''add intersection of collapsed gff with reference annotation information'''
+    input:
+        gff = rules.collapse_to_isoforms.output.gff,
+        locus_bed = rules.annotate_reference_locus.output.mapping_bed
+    output:
+        locus_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed.gff"
+    shell:'''
+bedtools intersect -a $gff -b $bed -wb | \
+    awk 'BEGIN{{FS="\\t"; OFS="\\t"}}{{$9=$9 " paralog="$13";" ;print $1,$2,$3,$4,$5,$6,$7,$8,$9}}' {output.locus_gff} 
+'''
+
 # rule pull_isoform_genomic_sequence:
 
 # rule pull_isoform_intronic_sequence:
