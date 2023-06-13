@@ -120,8 +120,7 @@ rule merge_locus_gff_info:
     output:
         locus_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed.gff"
     shell:'''
-bedtools intersect -a $gff -b $bed -wb | \
-    awk 'BEGIN{{FS="\\t"; OFS="\\t"}}{{$9=$9 " paralog="$13";" ;print $1,$2,$3,$4,$5,$6,$7,$8,$9}}' {output.locus_gff} 
+bedtools intersect -a {input.gff} -b {input.locus_bed} -wb | awk 'BEGIN{{FS="\\t"; OFS="\\t"}}{{$9=$9 " paralog="$13";" ;print $1,$2,$3,$4,$5,$6,$7,$8,$9}}' > {output.locus_gff} 
 '''
 
 # rule pull_isoform_genomic_sequence:
