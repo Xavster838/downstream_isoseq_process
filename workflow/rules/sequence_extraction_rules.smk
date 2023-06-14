@@ -48,16 +48,15 @@ rule pull_isoform_genomic_mRNA_sequence:
     samtools faidx {output.fa}
 """
 
-rule pull_isoform_intronic_sequence:
-    '''given subset gff file. get intronic sequence for each selected isoform.'''
+rule fold_ref:
+    '''make sure references are folded to 80 characters or less per line. AGAT does not work with single line fastas.'''
     input:
         ref  = get_species_sample_ref_path,
-        isoform_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons_topIsoforms.gff"
     output:
-        fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_intronic_sequence.fa" ,
-        fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_intronic_sequence.fa.fai"
+        tmp_folded_ref = temp("tmp/{ref2}__folded.fa"),
+        fai = temp("tmp/{ref2}__folded.fa.fai"),
     resources:
-        mem_mb = 4000
+        mem_mb = 8000
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -65,9 +64,30 @@ rule pull_isoform_intronic_sequence:
         ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
     shell:"""
-    agat_sp_extract_sequences.pl --gff {input.isoform_gff} --fasta {input.ref} -t intron --output {output.fa}
-    samtools faidx {output.fa}
+    fold -w 80 {input.ref} > {output.tmp_folded_ref}
+    samtools faidx {output.tmp_folded_ref}
+"""
 
+rule pull_isoform_intronic_sequence:
+    '''given subset gff file. get intronic sequence for each selected isoform.'''
+    input:
+        ref  = rules.fold_ref.output.tmp_folded_ref,  #get_species_sample_ref_path,
+        isoform_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons_topIsoforms.gff"
+    output:
+        fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_intronic_sequence.fa" ,
+        fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_intronic_sequence.fa.fai"
+    resources:
+        mem_mb = 8000
+    threads : 2
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
+    shell:"""
+    agat_sp_extract_sequences.pl --gff {input.isoform_gff} --fasta {input.ref} -t intron --merge --output {output.fa}
+    samtools faidx {output.fa}
+"""
 # rule pull_isoform_genomic_mRNA_sequence:
 # rule get_isoform_ORF:
 # rule get_isoform_aa_sequence:
