@@ -175,3 +175,25 @@ agat_sp_add_introns.pl --gff {input.gff} --out {output.temp_intron_gff}
 bedtools sort -i {output.temp_intron_gff} > {output.intron_gff}
 '''
 
+rule subset_gff_top_isoforms:
+    '''given locus gff, add introns for later extracting sequence'''
+    input:
+        intron_gff = rules.add_introns_locus_gff.output.intron_gff,
+        isoform_tbl = rules.get_top_paralog_isoforms.output.tbl
+    output:
+        subset_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons_topIsoforms.gff"
+    resources:
+        mem_mb = 8000
+    threads: 2
+    wildcard_constraints:
+        loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
+        ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] )
+    conda:
+        "../envs/annotation.yml"
+    shell:'''
+top_isoforms=( $(cut -f 2 {intput.isoform_tbl} | tail -n +2) )
+for isoform in "${top_isoforms[@]}"; do
+    grep -o "${isoform}" {input.intron_gff} >> {output.subset_gff}
+done
+'''
