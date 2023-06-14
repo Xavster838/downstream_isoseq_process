@@ -97,3 +97,4 @@ rule all:
 
 include: "rules/alignment_rules.smk"
 include: "rules/annotation_rules.smk"
+include: "rules/sequence_extraction_rules.smk"
