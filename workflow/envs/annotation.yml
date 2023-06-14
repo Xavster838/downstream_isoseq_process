@@ -2,6 +2,7 @@ channels:
   - bioconda
   - conda-forge
   - defaults
+  - r
 dependencies:
   - numpy
   - pandas
@@ -12,7 +13,7 @@ dependencies:
   - blat=36
   - bedtools #=2.31.0
   - samtools #=1.17  
-  - perl=5.32.0
-  - pcre2=10.39
-  - R=4.1.2
-  - agat=0.4.0
+  - perl>=5.26.2 #=5.32.0
+  - pcre2 #=10.39
+  - r-base=4.1.2
+  - agat #=0.4.0
