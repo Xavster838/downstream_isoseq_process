@@ -154,7 +154,24 @@ rule get_top_paralog_isoforms:
         "../envs/annotation.yml"
     script: "../scripts/get_top_paralog_isoforms.py"
 
-
+rule add_introns_locus_gff:
+    '''given locus gff, add introns for later extracting sequence'''
+    input:
+        gff = rules.merge_locus_gff_info.output.locus_gff,
+    output:
+        intron_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons.gff"
+    resources:
+        mem_mb = 8000
+    threads: 2
+    wildcard_constraints:
+        loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
+        ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] )
+    conda:
+        "../envs/annotation.yml"
+    shell:'''
+agat_sp_add_introns.pl --gff {input.gff} --out {output.intron_gff}
+'''
 # rule pull_isoform_genomic_sequence:
 
 # rule pull_isoform_intronic_sequence:
