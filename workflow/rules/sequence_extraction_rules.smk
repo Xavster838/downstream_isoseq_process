@@ -12,8 +12,8 @@ rule pull_paralog_genomic_sequence:
         ref  = get_species_sample_ref_path,
         locus_bed = "reference_annotations/{loc_name}/{ref1}/{ref2}__{loc_name}_mappings.bed"
     output:
-        fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_FILTERED_{ref2}_genomic_sequence.fa" ,
-        fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_FILTERED_{ref2}_genomic_sequence.fa.fai"
+        fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_genomic_sequence.fa" ,
+        fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_genomic_sequence.fa.fai"
     resources:
         mem_mb = 4000
     threads : 2
