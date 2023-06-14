@@ -120,9 +120,37 @@ rule merge_locus_gff_info:
         locus_bed = rules.annotate_reference_locus.output.mapping_bed
     output:
         locus_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed.gff"
+    resources:
+        mem_mb = 8000
+    threads: 2
+    wildcard_constraints:
+        loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
+        ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] )
+    conda:
+        "../envs/annotation.yml"
     shell:'''
 bedtools intersect -a {input.gff} -b {input.locus_bed} -wb | awk 'BEGIN{{FS="\\t"; OFS="\\t"}}{{$9=$9 " paralog="$13";" ;print $1,$2,$3,$4,$5,$6,$7,$8,$9}}' > {output.locus_gff} 
 '''
+
+rule get_top_paralog_isoforms:
+    '''find the most abundantly expressed isoforms for a given paralog defined by the locus annotations. Write to a table'''
+    input:
+        locus_gff = rules.merge_locus_gff_info.output.locus_gff,
+        abundance_tbl = rules.collapse_to_isoforms.output.abundance_tbl
+    output:
+        tbl = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_top_paralog_isoforms.tbl"
+    resources:
+        mem_mb = 8000
+    threads: 2
+    wildcard_constraints:
+        loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
+        ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] )
+    conda:
+        "../envs/annotation.yml"
+    script: "scripts/get_top_paralog_isoforms.py"
+
 
 # rule pull_isoform_genomic_sequence:
 
