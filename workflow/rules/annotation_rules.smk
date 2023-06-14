@@ -35,6 +35,9 @@ rule collapse_to_isoforms:
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
     shell:"""
 isoseq3 collapse -j {threads} --log-file {log} {input.bam} {output.gff}
+sed -i 's/gene_id /gene_id=/g' {output.gff} 
+sed -i 's/transcript_id /transcript_id=/g' {output.gff} #add equals signs to attributes
+sed -i 's/"//g' {output.gff} #get rid of double quotes
 """
 
 # ####    locus specific
