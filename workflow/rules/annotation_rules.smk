@@ -152,7 +152,7 @@ rule get_top_paralog_isoforms:
         ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] )
     conda:
         "../envs/annotation.yml"
-    script: "scripts/get_top_paralog_isoforms.py"
+    script: "../scripts/get_top_paralog_isoforms.py"
 
 
 # rule pull_isoform_genomic_sequence:
