@@ -174,12 +174,4 @@ rule add_introns_locus_gff:
 agat_sp_add_introns.pl --gff {input.gff} --out {output.temp_intron_gff}
 bedtools sort -i {output.temp_intron_gff} > {output.intron_gff}
 '''
-# rule pull_isoform_genomic_sequence:
 
-# rule pull_isoform_intronic_sequence:
-
-# rule pull_isoform_genomic_mRNA_sequence:
-
-# rule get_isoform_ORF:
-
-# rule get_isoform_aa_sequence:
