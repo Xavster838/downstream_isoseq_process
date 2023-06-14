@@ -192,8 +192,8 @@ rule subset_gff_top_isoforms:
     conda:
         "../envs/annotation.yml"
     shell:'''
-top_isoforms=( $(cut -f 2 {intput.isoform_tbl} | tail -n +2) )
-for isoform in "${top_isoforms[@]}"; do
-    grep -o "${isoform}" {input.intron_gff} >> {output.subset_gff}
+top_isoforms=( $(cut -f 2 {input.isoform_tbl} | tail -n +2) )
+for isoform in "${{top_isoforms[@]}}"; do
+    grep -o "${{isoform}}" {input.intron_gff} >> {output.subset_gff}
 done
 '''
