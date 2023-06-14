@@ -159,6 +159,7 @@ rule add_introns_locus_gff:
     input:
         gff = rules.merge_locus_gff_info.output.locus_gff,
     output:
+        temp_intron_gff = temp("tmp/alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons.gff"),
         intron_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons.gff"
     resources:
         mem_mb = 8000
@@ -170,7 +171,8 @@ rule add_introns_locus_gff:
     conda:
         "../envs/annotation.yml"
     shell:'''
-agat_sp_add_introns.pl --gff {input.gff} --out {output.intron_gff}
+agat_sp_add_introns.pl --gff {input.gff} --out {output.temp_intron_gff}
+bedtools sort -i {output.temp_intron_gff} > {output.intron_gff}
 '''
 # rule pull_isoform_genomic_sequence:
 
