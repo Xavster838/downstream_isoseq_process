@@ -92,13 +92,15 @@ rule pull_isoform_genomic_mRNA_sequence:
     samtools faidx {output.fa}
 """
 
-rule get_isoform_ORF:
+rule get_isoform_ORF_and_AA:
     '''given CDS file, predict ORFs.'''
     input:
-        isoform_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons_topIsoforms.gff"
+        mRNA_fa = rules.pull_isoform_genomic_mRNA_sequence.output.fa 
     output:
-        fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_ORF_sequence.fa" ,
-        fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_ORF_sequence.fa.fai"
+        orf_fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_ORF_sequence.fa" ,
+        orf_fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_ORF_sequence.fa.fai",
+        aa_fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_aa_sequence.fa",
+        aa_fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_aa_sequence.fa.fai"
     resources:
         mem_mb = 8000
     threads : 2
@@ -107,9 +109,10 @@ rule get_isoform_ORF:
     wildcard_constraints:
         ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
-    shell:"""
-    orfipy {input.fa} --dna {output.fa} --min 100 --max 10000 --start ATG
-    samtools faidx {output.fa}
-"""
+    shell:'''
+    orfipy {input.mRNA_fa} --dna $( basename "{output.orf_fa}" ) --pep $( basename "{output.aa_fa}") --outdir $( dirname "{output.orf_fa}" ) --min 100 --max 10000 --start ATG
+    samtools faidx {output.orf_fa}
+    samtools faidx {output.aa_fa}
+'''
 
 # rule get_isoform_aa_sequence:
