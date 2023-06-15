@@ -65,6 +65,8 @@ rule pull_isoform_intronic_sequence:
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
     shell:"""
     agat_sp_extract_sequences.pl --gff {input.isoform_gff} --fasta {input.ref} -t intron --merge --output {output.fa}
+    sed -i 's/[^>]*>\([^ ]*\) \(.*\)/\1/' {output.fa} #get rid of extranious info for later running ORFfinder
+    sed -i 's/>//' {output.fa} #get rid of > in the begining
     samtools faidx {output.fa}
 """
 
@@ -87,6 +89,8 @@ rule pull_isoform_genomic_mRNA_sequence:
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
     shell:"""
     agat_sp_extract_sequences.pl --gff {input.isoform_gff} --fasta {input.ref} -t exon --merge --output {output.fa}
+    sed -i 's/[^>]*>\([^ ]*\) \(.*\)/\1/' {output.fa} #get rid of extranious info for later running ORFfinder
+    sed -i 's/>//' {output.fa} #get rid of > in the begining
     samtools faidx {output.fa}
 """
 
