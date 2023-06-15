@@ -17,3 +17,4 @@ dependencies:
   - pcre2 #=10.39
   - r-base=4.1.2
   - agat #=0.4.0
+  - orfipy
