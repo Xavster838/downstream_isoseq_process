@@ -88,7 +88,7 @@ rule pull_isoform_genomic_mRNA_sequence:
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
     shell:"""
     agat_sp_extract_sequences.pl --gff {input.isoform_gff} --fasta {input.ref} -t exon --merge --keep_attributes --output {output.fa}
-    sed -i -n '/^>/ s/.*paralog=\([^ ]*\).*transcript_id=\([^ ]*\).*/>{wildcards.SMP}__\\1__\\2/p; /^>/! p' {output.fa} #fix names
+    sed -i 's/[^>]*>\([^ ]*\) \(.*\)/>\\1/' {output.fa} #get rid of extranious info for later running ORFfinder
     samtools faidx {output.fa}
 """
 
