@@ -47,7 +47,7 @@ else:
 #process AA fa
 process_fasta(snakemake.input['aa_fa'], snakemake.output['aa_fa'])
 # Run the bash command
-exit_code = os.system(f"samtools faidx {snakemake.output['orf_fa']}")
+exit_code = os.system(f"samtools faidx {snakemake.output['aa_fa']}")
 # Check if the command was successful
 if exit_code == 0:
     print("aa_fa processed and indexed.")
