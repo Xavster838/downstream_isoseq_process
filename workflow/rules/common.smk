@@ -142,3 +142,11 @@ def get_sample_reference(wc):
     '''given a reference name, like CHM13 or Jim_h1, return the path to that reference identified by one of the samples in the manifest'''
     return [ref_path for ref_path in manifest_df["reference"] if get_nhp_ref_name( ref_path ) == wc.ref2 ][0]
 
+def get_all_intron_fas(wc):
+    '''given manifest, get all intron fastas'''
+    output_string = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_intronic_sequence.fa"
+    out_fastas = []
+    for cur_loc in list(config["ref_map_loci"].keys()):
+        out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"], ref1 = Path(cur_row["reference"]).stem, ref2 = Path(cur_row["reference"]).stem, loc_name = cur_loc) for i, cur_row in manifest_df.iterrows()]
+        out_fastas = [out_fastas, out_paths]
+    return out_fastas

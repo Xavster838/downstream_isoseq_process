@@ -88,6 +88,12 @@ rule get_hg38_collapse:
     input:
         stats = get_all_hg38_collapse
 
+rule get_all_introns:
+    '''get all intronic sequence of a sample'''
+    input: 
+        intron_fas = get_all_intron_fas
+
+
 
 rule all:
     input:
