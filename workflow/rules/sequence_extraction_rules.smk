@@ -64,8 +64,9 @@ rule pull_isoform_intronic_sequence:
         ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
     shell:"""
-    agat_sp_extract_sequences.pl --gff {input.isoform_gff} --fasta {input.ref} -t intron --merge --output {output.fa}
-    sed -i 's/[^>]*>\([^ ]*\) \(.*\)/>\\1/' {output.fa} #get rid of extranious info for later running ORFfinder
+    agat_sp_extract_sequences.pl --gff {input.isoform_gff} --fasta {input.ref} -t intron --keep_attributes --merge --output {output.fa}
+    sed -i -n '/^>/ s/.*paralog=\([^ ]*\).*transcript_id=\([^ ]*\).*/>{SMP}\1__\2/p; /^>/! p' {output.fa} #fix names
+    #sed -i 's/[^>]*>\([^ ]*\) \(.*\)/>\\1/' {output.fa} #get rid of extranious info for later running ORFfinder
     samtools faidx {output.fa}
 """
 
