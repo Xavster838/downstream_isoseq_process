@@ -97,10 +97,8 @@ rule get_isoform_ORF_and_AA:
     input:
         mRNA_fa = rules.pull_isoform_genomic_mRNA_sequence.output.fa 
     output:
-        orf_fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_ORF_sequence.fa" ,
-        orf_fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_ORF_sequence.fa.fai",
-        aa_fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_aa_sequence.fa",
-        aa_fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_aa_sequence.fa.fai"
+        orf_fa = temp( "tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_ORF_sequence.fa" ) ,
+        aa_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_aa_sequence.fa"),
     resources:
         mem_mb = 8000
     threads : 2
@@ -111,8 +109,26 @@ rule get_isoform_ORF_and_AA:
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
     shell:'''
     orfipy {input.mRNA_fa} --dna $( basename "{output.orf_fa}" ) --pep $( basename "{output.aa_fa}") --outdir $( dirname "{output.orf_fa}" ) --min 100 --max 10000 --start ATG
-    samtools faidx {output.orf_fa}
-    samtools faidx {output.aa_fa}
 '''
+
+rule fix_ORF_AA_names:
+    input:
+        orf_fa = rules.get_isoform_ORF_and_AA.output.orf_fa ,
+        aa_fa = rules.get_isoform_ORF_and_AA.output.aa_fa ,
+        tbl = rules.get_top_paralog_isoforms.output.tbl
+    output:
+        orf_fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_ORF_sequence.fa" ,
+        orf_fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_ORF_sequence.fa.fai",
+        aa_fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_aa_sequence.fa",
+        aa_fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_aa_sequence.fa.fai",
+    resources:
+        mem_mb = 8000
+    threads : 2
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
+    script: "../scripts/process_orf_aa_fastas.py"
 
 # rule get_isoform_aa_sequence:
