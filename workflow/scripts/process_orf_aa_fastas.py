@@ -29,7 +29,7 @@ def process_fasta(in_fasta, out_fasta):
     #write to fasta
     with open(out_fasta, 'w') as new_file:
         for cur_isoform, info_dict in largest_orf_isoforms.items():
-            out_name = f"{info_dict['paralog']}__{cur_isoform}"
+            out_name = f"{snakemake.wildcards['SMP']}__{info_dict['paralog']}__{cur_isoform}"
             out_seq = info_dict['sequence']
             new_file.write(f'>{out_name}\n')
             new_file.write(f'{out_seq}\n')
