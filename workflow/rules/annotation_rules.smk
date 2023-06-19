@@ -194,6 +194,10 @@ rule subset_gff_top_isoforms:
     shell:'''
 top_isoforms=( $(cut -f 2 {input.isoform_tbl} | tail -n +2) )
 for isoform in "${{top_isoforms[@]}}"; do
-    grep "${{isoform}}" {input.intron_gff} >> {output.subset_gff}
+    if grep "${{isoform}}" {input.intron_gff} >> {output.subset_gff}; then
+        echo "match_found"
+    else
+        echo "no match found for ${{isoform}} in {wildcards.SMP}"
+    fi
 done
 '''
