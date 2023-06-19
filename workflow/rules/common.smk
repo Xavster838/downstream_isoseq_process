@@ -147,6 +147,8 @@ def get_all_intron_fas(wc):
     output_string = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_intronic_sequence.fa"
     out_fastas = []
     for cur_loc in list(config["ref_map_loci"].keys()):
+        print(cur_loc)
         out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"], ref1 = Path(cur_row["reference"]).stem, ref2 = Path(cur_row["reference"]).stem, loc_name = cur_loc) for i, cur_row in manifest_df.iterrows()]
-        out_fastas = [out_fastas, out_paths]
+        print(out_paths)
+        out_fastas = out_fastas + out_paths
     return out_fastas
