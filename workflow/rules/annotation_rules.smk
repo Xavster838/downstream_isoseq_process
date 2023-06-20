@@ -154,31 +154,10 @@ rule get_top_paralog_isoforms:
         "../envs/annotation.yml"
     script: "../scripts/get_top_paralog_isoforms.py"
 
-rule add_introns_locus_gff:
-    '''given locus gff, add introns for later extracting sequence'''
-    input:
-        gff = rules.merge_locus_gff_info.output.locus_gff,
-    output:
-        temp_intron_gff = temp("tmp/alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons.gff"),
-        intron_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons.gff"
-    resources:
-        mem_mb = 8000
-    threads: 2
-    wildcard_constraints:
-        loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
-        ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
-        ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] )
-    conda:
-        "../envs/annotation.yml"
-    shell:'''
-agat_sp_add_introns.pl --gff {input.gff} --out {output.temp_intron_gff}
-bedtools sort -i {output.temp_intron_gff} > {output.intron_gff}
-'''
-
 rule subset_gff_top_isoforms:
     '''given locus gff, add introns for later extracting sequence'''
     input:
-        intron_gff = rules.add_introns_locus_gff.output.intron_gff,
+        intron_gff = rules.merge_locus_gff_info.output.locus_gff,
         isoform_tbl = rules.get_top_paralog_isoforms.output.tbl
     output:
         subset_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons_topIsoforms.gff"
@@ -200,4 +179,25 @@ for isoform in "${{top_isoforms[@]}}"; do
         echo "no match found for ${{isoform}} in {wildcards.SMP}"
     fi
 done
+'''
+
+rule add_introns_locus_gff:
+    '''given locus gff, add introns for later extracting sequence'''
+    input:
+        gff = rules.subset_gff_top_isoforms.output.subset_gff,
+    output:
+        temp_intron_gff = temp("tmp/alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons.gff"),
+        intron_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons.gff"
+    resources:
+        mem_mb = 8000
+    threads: 2
+    wildcard_constraints:
+        loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
+        ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] )
+    conda:
+        "../envs/annotation.yml"
+    shell:'''
+agat_sp_add_introns.pl --gff {input.gff} --out {output.temp_intron_gff}
+bedtools sort -i {output.temp_intron_gff} > {output.intron_gff}
 '''
