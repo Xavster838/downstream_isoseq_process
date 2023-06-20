@@ -93,7 +93,15 @@ rule get_all_introns:
     input: 
         intron_fas = get_all_intron_fas
 
+rule get_all_exons:
+    '''get all genomic mRNA sequence of a sample'''
+    input: 
+        exon_fas = get_all_exon_fas
 
+rule get_all_ORFs:
+    '''get all intronic sequence of a sample'''
+    input: 
+        ORF_fas = get_all_ORF_fas
 
 rule all:
     input:
