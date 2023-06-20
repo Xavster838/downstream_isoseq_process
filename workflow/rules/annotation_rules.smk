@@ -160,7 +160,7 @@ rule subset_gff_top_isoforms:
         intron_gff = rules.merge_locus_gff_info.output.locus_gff,
         isoform_tbl = rules.get_top_paralog_isoforms.output.tbl
     output:
-        subset_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons_topIsoforms.gff"
+        subset_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_topIsoforms.gff"
     resources:
         mem_mb = 8000
     threads: 2
@@ -173,7 +173,7 @@ rule subset_gff_top_isoforms:
     shell:'''
 top_isoforms=( $(cut -f 2 {input.isoform_tbl} | tail -n +2) )
 for isoform in "${{top_isoforms[@]}}"; do
-    if grep "${{isoform}}&" {input.intron_gff} >> {output.subset_gff}; then
+    if grep "${{isoform}};" {input.intron_gff} >> {output.subset_gff}; then
         echo "match_found"
     else
         echo "no match found for ${{isoform}} in {wildcards.SMP}"
@@ -187,7 +187,7 @@ rule add_introns_locus_gff:
         gff = rules.subset_gff_top_isoforms.output.subset_gff,
     output:
         temp_intron_gff = temp("tmp/alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons.gff"),
-        intron_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons.gff"
+        intron_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons_topIsoforms.gff"
     resources:
         mem_mb = 8000
     threads: 2
