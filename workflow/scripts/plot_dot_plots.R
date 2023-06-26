@@ -19,10 +19,10 @@ if (length(args) != 5) {
   regions_path <- args[5]
 }
 
-cur_nhp = snakemake.wildcards["SPRPOP"]
-cur_sample = snakemake.wildcards["SMP"]
-cur_tbl_path = snakemake.input["tbl"]
-regions_path <- snakemake.input["rgns"]
+cur_nhp = snakemake.wildcards[["SPRPOP"]]
+cur_sample = snakemake.wildcards[["SMP"]]
+cur_tbl_path = snakemake.input[["tbl"]]
+regions_path <- snakemake.input[["rgns"]]
 
 
 #load data
@@ -46,6 +46,9 @@ tbl_ranges = makeGRangesFromDataFrame(tbl, keep.extra.columns = T,
 
 #get overlaps
 overlaps = GenomicRanges::findOverlaps(tbl_ranges, regions)
+if(nrow(overlaps) > nrow(tbl) ){
+    stop(glue("reads are overlapping multiple regions. Not sure which region to annotate them as. Check table and regions for {snakemake@wildcards[['SMP']]}.") )
+}
 #remove reads that don't overlap with : regions.bed
 tbl$gene = regions$gene[overlaps@to] #add gene name
 tbl = tbl[overlaps@from,] #remove any genes that were not overlaps
