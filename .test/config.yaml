@@ -4,3 +4,5 @@ T2T_ref : /net/eichler/vol26/projects/chm13_t2t/nobackups/assemblies/T2T-CHM13v2
 min_read_length : 1000
 min_read_quality : 30
 ref_map_loci : {"TBC1D3" : "/net/eichler/vol26/home/guitarfx/universally_useful_data/TBC1D3/TBC1D3L_sequence_exonUPPER.fa"} #paralog or sequence to map in an assembly 
+min_perID : 98 #minimum percent identity threshold for percent-id dot plots
+min_map_len : 6000 #minimum mapping length for reference mapping (should be smaler than ref_map_loci)
