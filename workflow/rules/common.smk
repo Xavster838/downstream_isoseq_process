@@ -175,3 +175,14 @@ def get_all_ORF_fas(wc):
         out_fastas = out_fastas + out_paths
     return out_fastas
     
+
+def get_all_dot_plots(wc):
+    '''given manifest, get all isoseq dotplots for choosing functional paralogs'''
+    output_string = "plots/{loc_name}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_isoseq_dotplots.pdf"
+    out_fastas = []
+    for cur_loc in list(config["ref_map_loci"].keys()):
+        print(cur_loc)
+        out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"], ref1 = Path(cur_row["reference"]).stem, ref2 = Path(cur_row["reference"]).stem, loc_name = cur_loc) for i, cur_row in manifest_df.iterrows()]
+        print(out_paths)
+        out_fastas = out_fastas + out_paths
+    return out_fastas
