@@ -1,0 +1,12 @@
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - r
+dependencies:
+  - pcre2 #=10.39
+  - r-base=4.1.3
+  - r-tidyverse
+  - bioconductor-genomicranges
+  - r-ggplot2
+  - r-glue
