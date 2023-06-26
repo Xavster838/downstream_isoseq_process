@@ -1,31 +1,16 @@
 #Rscript to generate dotplots from outputs of downstream isoseq pipeline.
-
 #load libraries
 library(tidyverse)
 library(GenomicRanges)
 library(ggplot2)
 library(glue)
+#cur_nhp = snakemake.wildcards[["SPRPOP"]]
+#cur_sample = snakemake.wildcards[["SMP"]]
+cur_tbl_path = snakemake@input[["tbl"]]
+regions_path <- snakemake@input[["rgns"]]
+cur_nhp = snakemake@params[['cur_nhp']]
+cur_sample = snakemake@params[['cur_sample']]
 
-### pass as flags
-args = commandArgs(trailingOnly=TRUE)
-
-if (length(args) != 5) {
-  stop("required arguments (in order): species, sample_name, tissue, isoseq.tbl path, regions.bed path", call.=FALSE)
-} else {
-  cur_nhp = args[1]
-  cur_sample = args[2]
-  cur_tissue = args[3]
-  cur_tbl_path = args[4]
-  regions_path <- args[5]
-}
-
-cur_nhp = snakemake.wildcards[["SPRPOP"]]
-cur_sample = snakemake.wildcards[["SMP"]]
-cur_tbl_path = snakemake.input[["tbl"]]
-regions_path <- snakemake.input[["rgns"]]
-
-
-#load data
 tbl = read_tsv(cur_tbl_path)
 colnames(tbl)[1] = "reference_name"
 regions = read_table(regions_path, col_names = c("seqnames", "start", "stop", "name", ".", "strand"))
@@ -37,7 +22,7 @@ regions$gene = regions$name #add gene column for logic I pulled from previous co
 
 #figure out primary alignments by matches column
 tbl = tbl %>% arrange( desc(matches) )
-tbl = tbl %>% group_by(query_name) %>% mutate(alignment_n =  group_indices() ) %>% mutate(is_primary = ifelse(alignment_n == 1, yes = TRUE, no = FALSE) ) %>% ungroup() #order alignments by matches and number them as primary, secondary, etc.
+tbl = tbl %>% group_by(query_name) %>% mutate(alignment_n =  row_number() ) %>% mutate(is_primary = ifelse(alignment_n == 1, yes = TRUE, no = FALSE) ) %>% ungroup() #order alignments by matches and number them as primary, secondary, etc.
 tbl_ranges = makeGRangesFromDataFrame(tbl, keep.extra.columns = T, 
                                       seqnames.field = "reference_name", 
                                       start.field = "reference_start",end.field = "reference_end", strand.field = "strand")
@@ -46,16 +31,17 @@ tbl_ranges = makeGRangesFromDataFrame(tbl, keep.extra.columns = T,
 
 #get overlaps
 overlaps = GenomicRanges::findOverlaps(tbl_ranges, regions)
-if(nrow(overlaps) > nrow(tbl) ){
-    stop(glue("reads are overlapping multiple regions. Not sure which region to annotate them as. Check table and regions for {snakemake@wildcards[['SMP']]}.") )
+if( length(overlaps@from) > nrow(tbl) ){
+    stop(glue("reads are overlapping multiple regions. Not sure which region to annotate them as. Check table and regions for {cur_sample}.") )
 }
 #remove reads that don't overlap with : regions.bed
-tbl$gene = regions$gene[overlaps@to] #add gene name
+tbl$gene = NA
+tbl$gene[overlaps@from] = regions$gene[overlaps@to] #add gene name
 tbl = tbl[overlaps@from,] #remove any genes that were not overlaps
 
 #generate first plot
 #get plot with all alignments
-MIN_p_THRESH = snakemake.config["min_perID"]
+MIN_p_THRESH = snakemake@config[["min_perID"]]
 
 #plot 1: percentage identity plot for all reads
 p1 = ggplot(data = tbl %>% filter(perID_by_events >= MIN_p_THRESH), mapping = aes(x = gene, y = perID_by_events)) + 
@@ -86,7 +72,7 @@ p2 = ggplot(data = tbl2 , mapping = aes(x = gene, y = difference_with_secondary)
 
 #save plots
 plots_list = list(p1, p2)
-pdf( glue("{cur_nhp}_{cur_sample}_{cur_tissue}_isoseq_processing.pdf"), onefile = TRUE, width = 9, height = 6 )
+pdf( snakemake@output[['plt']] , onefile = TRUE, width = 9, height = 6 )
 for(i in 1:length(plots_list) ){
   plot(plots_list[[i]])
 }
