@@ -61,7 +61,7 @@ rule annotate_reference_locus:
     shell:"""
 blat -t=dna -q=dna -minScore=100 -maxIntron=500 -minMatch=3 {input.ref} {input.loc_seq} {output.temp_mapping_psl}
 tail -n +6 {output.temp_mapping_psl} | cut -f14,16,17,10,9 | \
-    awk 'BEGIN {{FS="\\t"; OFS="\\t"}} {{print $3,$4,$5,"{wildcards.loc_name}" , ".",$1}}' | bedtools sort | awk 'BEGIN {{FS="\\t"; OFS="\\t"}}{{$4=$4"_"NR; print $0}}' > {output.mapping_bed}
+    awk 'BEGIN {{FS="\\t"; OFS="\\t"}} {{print $3,$4,$5,"{wildcards.loc_name}" , ".",$1}}' | bedtools sort | awk 'BEGIN {{FS="\\t"; OFS="\\t"}}{{$4=$4"_"NR; print $0}}' | awk '{{ if (($3 - $2) > {config.min_map_len}) print }}' > {output.mapping_bed}
 """
 
 rule subset_alignment_bam_by_locus:
