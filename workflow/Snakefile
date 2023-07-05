@@ -103,6 +103,11 @@ rule get_all_ORFs:
     input: 
         ORF_fas = get_all_ORF_fas
 
+rule get_all_dot_plots:
+    '''get all isoseq library dotplots'''
+    input: 
+        dot_plots = get_all_dot_plots
+
 rule all:
     input:
        tmp_fastqs = [f"tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_2.fastq" for SMP, SPRPOP in list(zip(manifest_df["sample"] , manifest_df["superpop"])) ]
