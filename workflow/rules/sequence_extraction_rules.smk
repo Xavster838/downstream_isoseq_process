@@ -69,6 +69,28 @@ rule pull_isoform_intronic_sequence:
     samtools faidx {output.fa}
 """
 
+rule pull_all_isoform_genomic_mRNA_sequence:
+    '''given the {loc.name} gff (not top isoform subset gff), get all genomic mRNA'''
+    input:
+        ref  = rules.fold_ref.output.tmp_folded_ref,  #get_species_sample_ref_path,
+        gff = rules.merge_locus_gff_info.output.locus_gff
+    output:
+        fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_exon_sequence.fa" 
+        fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_exon_sequence.fa.fai"
+    resources:
+        mem_mb = 8000
+    threads : 2
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
+    shell:"""
+    agat_sp_extract_sequences.pl --gff {input.gff} --fasta {input.ref} -t exon --merge --keep_attributes --output {output.fa}
+    sed -i 's/[^>]*>\([^ ]*\) \(.*\)/>\\1/' {output.fa} #get rid of extranious info for later running ORFfinder
+    samtools faidx {output.fa}
+"""
+    
 
 rule pull_isoform_genomic_mRNA_sequence:
     '''given subset gff file. get all exons for each selected isoform.'''
