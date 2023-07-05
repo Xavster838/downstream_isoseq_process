@@ -114,6 +114,30 @@ rule pull_isoform_genomic_mRNA_sequence:
     samtools faidx {output.fa}
 """
 
+rule get_all_isoform_ORF_and_AA:
+    '''given the {loc.name} gff (not top isoform subset gff), get all the ORFs and AA'''
+    input:
+        mRNA_fa = rules.pull_all_isoform_genomic_mRNA_sequence.output.fa 
+    output:
+        orf_fa = temp( "tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_ORF_sequence.fa" ) ,
+        orf_fai = temp( "tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_ORF_sequence.fa.fai" ) ,
+        aa_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_aa_sequence.fa"),
+        aa_fai = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_aa_sequence.fa.fai"),
+    resources:
+        mem_mb = 8000
+    threads : 2
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
+    shell:'''
+    orfipy {input.mRNA_fa} --dna $( basename "{output.orf_fa}" ) --pep $( basename "{output.aa_fa}") --outdir $( dirname "{output.orf_fa}" ) --min 100 --max 10000 --start ATG
+    samtools faidx {output.orf_fa}
+    samtools faidx {output.aa_fa}
+'''
+
+
 rule get_isoform_ORF_and_AA:
     '''given CDS file, predict ORFs.'''
     input:
