@@ -47,6 +47,27 @@ rule fold_ref:
     samtools faidx {output.tmp_folded_ref}
 """
 
+rule add_introns_gff:
+    '''Add introns to loc_name gff file'''
+    input:
+        gff = rules.merge_locus_gff_info.output.locus_gff,
+    output:
+        temp_intron_gff = temp("tmp/alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_all_collapsed_withIntrons.gff"),
+        intron_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_all_collapsed_withIntrons.gff"
+    resources:
+        mem_mb = 8000
+    threads: 2
+    wildcard_constraints:
+        loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
+        ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] )
+    conda:
+        "../envs/annotation.yml"
+    shell:'''
+agat_sp_add_introns.pl --gff {input.gff} --out {output.temp_intron_gff}
+bedtools sort -i {output.temp_intron_gff} > {output.intron_gff}
+'''
+
 rule pull_isoform_intronic_sequence:
     '''given subset gff file. get intronic sequence for each selected isoform.'''
     input:
