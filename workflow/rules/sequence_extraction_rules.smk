@@ -207,6 +207,56 @@ rule get_longest_paralog_isoform_orfs_aa_list:
     done
 '''
 
+rule pull_longest_isoform_introns_mRNAs:
+    '''given list from rule get_longest_paralog_isoform_orfs_aa_list, pull introns and genomic mRNAs sequences.'''
+    input:
+        lst = rules.get_longest_paralog_isoform_orfs_aa_list.output.isoform_list,
+        intron_fa = rules.pull_all_isoform_intron_sequence.output.fa,
+        mRNA_fa = rules.pull_all_isoform_genomic_mRNA_sequence.output.fa ,
+    output:
+        tmp_isoform_tbl = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoforms_no_ORF.lst"),
+        intron_fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_intron_sequence.fa",
+        intron_fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_intron_sequence.fa.fai",
+        mRNA_fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_genomic_mRNA_sequence.fa",
+        mRNA_fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_genomic_mRNA_sequence.fa.fai",
+    resources:
+        mem_mb = 8000
+    threads : 2
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
+    shell:'''
+    sed 's/_.*//g' {input.lst} > {output.tmp_isoform_tbl}
+    seqtk subseq {input.intron_fa} {output.tmp_isoform_tbl} > {output.intron_fa}
+    samtools faidx {output.intron_fa}
+    seqtk subseq {input.mRNA_fa} {output.tmp_isoform_tbl} > {output.mRNA_fa}
+    samtools faidx {output.mRNA_fa}
+''' 
+
+rule pull_longest_paralog_isofrom_ORFs_AAs:
+    '''given list from rule get_longest_paralog_isoform_orfs_aa_list, pull ORF, and AA sequences.'''
+    input:
+        lst = rules.get_longest_paralog_isoform_orfs_aa_list.output.isoform_list,
+        orf_fa = rules.get_all_isoform_ORF_and_AA.output.orf_fa ,
+        aa_fa = rules.get_all_isoform_ORF_and_AA.output.aa_fa,
+    output:
+        orf_fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_ORF_sequence.fa" ,
+        aa_fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_aa_sequence.fa",
+    resources:
+        mem_mb = 8000
+    threads : 2
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
+    shell:'''
+    seqtk subseq {input.orf_fa} {input.lst} > {output.orf_fa}
+    seqtk subseq {input.aa_fa} {input.lst} > {output.aa_fa}
+''' 
+    
 rule get_isoform_ORF_and_AA:
     '''given CDS file, predict ORFs.'''
     input:
