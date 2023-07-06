@@ -96,8 +96,8 @@ rule pull_all_isoform_intron_sequence:
         ref  = rules.fold_ref.output.tmp_folded_ref,  #get_species_sample_ref_path,
         gff = rules.add_introns_gff.output.intron_gff
     output:
-        fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_intron_sequence.fa", 
-        fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_intron_sequence.fa.fai"
+        fa = "tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_intron_sequence.fa", 
+        fai = "tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_intron_sequence.fa.fai"
     resources:
         mem_mb = 8000
     threads : 2
