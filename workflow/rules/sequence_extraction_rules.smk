@@ -137,6 +137,32 @@ rule get_all_isoform_ORF_and_AA:
     samtools faidx {output.aa_fa}
 '''
 
+rule get_longest_paralog_isoform_orfs_aa_list:
+    '''given AA sequence from get_all_isoform_ORF_and_AA, determine the longest reading frame for each paralog and output just those sequences'''
+    input:
+        aa_fai = rules.get_all_isoform_ORF_and_AA.output.aa_fai
+    output:
+        isoform_list = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoforms.lst")
+        tmp_sorted_fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_aa_sequence_SORTED.fa.fai",
+    resources:
+        mem_mb = 8000
+    threads : 2
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
+    shell:'''
+    #sort by longest isoform
+    sort -nr -k 2,2 {input.aa_fai} > {output.tmp_sorted_fai}
+    #get top (process each paralog separately)
+    mapfile -t paralog_array < <(cut -f 1 {output.tmp_sorted_fai} | sort | sed "s/\.[0-9]\+_ORF\.[0-9]\+//g" | sort | uniq) #get array of paralog names
+    # Print the array elements
+    for cur_paralog in "${paralog_array[@]}"; do
+        top_paralog=$(grep "${cur_paralog}\." {output.tmp_sorted_fai} | sort -nr -k 2,2 | head -n 1 | cut -f 1)
+        printf "${top_paralog}\n" >> {output.isoform_list}
+    done
+'''
 
 rule get_isoform_ORF_and_AA:
     '''given CDS file, predict ORFs.'''
