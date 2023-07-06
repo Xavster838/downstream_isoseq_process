@@ -176,6 +176,8 @@ rule get_all_isoform_ORF_and_AA:
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
     shell:'''
     orfipy {input.mRNA_fa} --dna $( basename "{output.orf_fa}" ) --pep $( basename "{output.aa_fa}") --outdir $( dirname "{output.orf_fa}" ) --min 100 --max 10000 --start ATG
+    sed -i 's/[^>]*>\([^ ]*\) \(.*\)/>\\1/' {output.orf_fa} #get rid of extranious info for later running ORFfinder
+    sed -i 's/[^>]*>\([^ ]*\) \(.*\)/>\\1/' {output.aa_fa} #get rid of extranious info for later running ORFfinder
     samtools faidx {output.orf_fa}
     samtools faidx {output.aa_fa}
 '''
