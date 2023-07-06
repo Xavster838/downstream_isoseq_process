@@ -94,7 +94,7 @@ rule pull_all_isoform_intron_sequence:
     '''given the {loc.name} gff (not top isoform subset gff), get all genomic mRNA'''
     input:
         ref  = rules.fold_ref.output.tmp_folded_ref,  #get_species_sample_ref_path,
-        gff = rules.merge_locus_gff_info.output.locus_gff
+        gff = rules.add_introns_gff.output.intron_gff
     output:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_intron_sequence.fa", 
         fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_intron_sequence.fa.fai"
