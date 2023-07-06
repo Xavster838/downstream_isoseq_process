@@ -108,6 +108,11 @@ rule get_all_dot_plots:
     input: 
         dot_plots = get_all_dot_plots
 
+rule get_all_paralog_longest_orf_ORF_AA_seqs:
+    '''get paralog longest ORF orf and aa sequences'''
+    input:
+        fas = get_all_longest_paralog_isoform_orf_aa
+
 rule all:
     input:
        tmp_fastqs = [f"tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_2.fastq" for SMP, SPRPOP in list(zip(manifest_df["sample"] , manifest_df["superpop"])) ]
