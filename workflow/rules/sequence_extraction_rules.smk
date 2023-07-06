@@ -75,7 +75,7 @@ rule pull_all_isoform_genomic_mRNA_sequence:
         ref  = rules.fold_ref.output.tmp_folded_ref,  #get_species_sample_ref_path,
         gff = rules.merge_locus_gff_info.output.locus_gff
     output:
-        fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_exon_sequence.fa" 
+        fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_exon_sequence.fa", 
         fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_exon_sequence.fa.fai"
     resources:
         mem_mb = 8000
@@ -142,7 +142,7 @@ rule get_longest_paralog_isoform_orfs_aa_list:
     input:
         aa_fai = rules.get_all_isoform_ORF_and_AA.output.aa_fai
     output:
-        isoform_list = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoforms.lst")
+        isoform_list = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoforms.lst"),
         tmp_sorted_fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_aa_sequence_SORTED.fa.fai",
     resources:
         mem_mb = 8000
@@ -158,9 +158,9 @@ rule get_longest_paralog_isoform_orfs_aa_list:
     #get top (process each paralog separately)
     mapfile -t paralog_array < <(cut -f 1 {output.tmp_sorted_fai} | sort | sed "s/\.[0-9]\+_ORF\.[0-9]\+//g" | sort | uniq) #get array of paralog names
     # Print the array elements
-    for cur_paralog in "${paralog_array[@]}"; do
-        top_paralog=$(grep "${cur_paralog}\." {output.tmp_sorted_fai} | sort -nr -k 2,2 | head -n 1 | cut -f 1)
-        printf "${top_paralog}\n" >> {output.isoform_list}
+    for cur_paralog in "${{paralog_array[@]}}"; do
+        top_paralog=$(grep "${{cur_paralog}}\." {output.tmp_sorted_fai} | sort -nr -k 2,2 | head -n 1 | cut -f 1)
+        printf "${{top_paralog}}\n" >> {output.isoform_list}
     done
 '''
 
