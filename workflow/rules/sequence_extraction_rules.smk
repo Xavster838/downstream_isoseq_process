@@ -200,13 +200,14 @@ rule get_longest_paralog_isoform_orfs_aa_list:
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
     shell:'''
     #sort by longest isoform
-    sort -nr -k 2,2 {input.aa_fai} > {output.tmp_sorted_fai}
+    sort -nr -k 2,2 {input.aa_fai} > {output.tmp_sorted_fai} 2> {log}
     #get top (process each paralog separately)
     mapfile -t paralog_array < <(cut -f 1 {output.tmp_sorted_fai} | sort | sed "s/\.[0-9]\+_ORF\.[0-9]\+//g" | sort | uniq) #get array of paralog names
     # Print the array elements
     for cur_paralog in "${{paralog_array[@]}}"; do
-        top_paralog=$(grep "${{cur_paralog}}\." {output.tmp_sorted_fai} | sort -nr -k 2,2 | head -n 1 | cut -f 1)
-        printf "${{top_paralog}}\n" >> {output.isoform_list}
+        grep "${{cur_paralog}}\." {output.tmp_sorted_fai} | sort -nr -k 2,2 > {output.tmp_fai} 
+        top_paralog=$( head -n 1 {output.tmp_fai} | cut -f 1 )
+        printf "${{top_paralog}}\n" >> {output.isoform_list} 2> {log}
     done
 '''
 
