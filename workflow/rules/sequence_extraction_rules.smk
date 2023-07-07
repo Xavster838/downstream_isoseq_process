@@ -193,6 +193,7 @@ rule get_longest_paralog_isoform_orfs_aa_list:
     resources:
         mem_mb = 8000
     threads : 2
+    log: "logs/{loc_name}__{SMP}__{SPRPOP}__{ref1}__{ref2}__get_longest_paralog_isoform_orfs_aa_list.log"
     conda:
         "../envs/annotation.yml"
     wildcard_constraints:
