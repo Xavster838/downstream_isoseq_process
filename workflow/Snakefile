@@ -116,7 +116,7 @@ rule get_all_paralog_longest_orf_ORF_AA_seqs:
 rule get_all_longest_paralog_isoform_introns:
     '''get paralog longest ORF isoform introns and genomic mRNAs'''
     input:
-        fas = get_all_longest_paralog_isoform_orf_aa
+        fas = get_all_longest_paralog_isoform_introns 
 
 rule all:
     input:
