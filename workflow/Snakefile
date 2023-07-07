@@ -113,6 +113,11 @@ rule get_all_paralog_longest_orf_ORF_AA_seqs:
     input:
         fas = get_all_longest_paralog_isoform_orf_aa
 
+rule get_all_longest_paralog_isoform_introns:
+    '''get paralog longest ORF isoform introns and genomic mRNAs'''
+    input:
+        fas = get_all_longest_paralog_isoform_orf_aa
+
 rule all:
     input:
        tmp_fastqs = [f"tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_2.fastq" for SMP, SPRPOP in list(zip(manifest_df["sample"] , manifest_df["superpop"])) ]
