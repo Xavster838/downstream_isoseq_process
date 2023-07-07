@@ -188,7 +188,8 @@ rule get_longest_paralog_isoform_orfs_aa_list:
         aa_fai = rules.get_all_isoform_ORF_and_AA.output.aa_fai
     output:
         isoform_list = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoforms.lst"),
-        tmp_sorted_fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_aa_sequence_SORTED.fa.fai",
+        tmp_sorted_fai = temp("sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_aa_sequence_SORTED.fa.fai"),
+        tmp_fai = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_tmp.fai")
     resources:
         mem_mb = 8000
     threads : 2
