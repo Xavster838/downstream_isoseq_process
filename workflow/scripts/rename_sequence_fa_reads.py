@@ -35,7 +35,7 @@ records = list(SeqIO.parse(fa, "fasta"))
 for record in records:
     transcript_id = record.id.split('_')[0] #ORFs and AA have an ending _ORF_10 that I need to remove
     paralog = par_iso_dict[transcript_id] # 
-    new_name = f"{sample_name}__{paralog}__{transcript_id}"
+    new_name = f"{snakemake.wildcards['SMP']}__{paralog}__{transcript_id}"
     record.id = new_names
     record.description = ""
 #write file
