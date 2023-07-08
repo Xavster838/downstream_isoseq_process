@@ -286,10 +286,10 @@ rule fix_longest_orf_isoform_orf_names:
     '''fix names for longest orf isoform names for ORF and AA sequence fastas'''
     input: 
         fa = rules.pull_longest_paralog_isofrom_ORFs_AAs.output.orf_fa,
-        gff = rules.merge_locus_gff_info.output.locus_gff
+        gff = rules.add_introns_gff.output.intron_gff
     output:
-        fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_ORF_sequence.fa"
-        fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_ORF_sequence.fa.fai"
+        fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_ORF_sequence.fa",
+        fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_ORF_sequence.fa.fai"
     resources:
         mem_mb = 8000
     threads : 2
@@ -298,7 +298,7 @@ rule fix_longest_orf_isoform_orf_names:
     wildcard_constraints:
         ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
-    script: "../scripts/process_orf_aa_fastas.py"
+    script: "../scripts/rename_sequence_fa_reads.py"
 
 
 rule fix_ORF_AA_names:
