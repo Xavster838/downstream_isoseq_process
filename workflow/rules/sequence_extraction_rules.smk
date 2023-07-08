@@ -283,7 +283,7 @@ rule get_isoform_ORF_and_AA:
 '''
 
 rule fix_longest_orf_isoform_orf_names:
-    '''fix names for longest orf isoform names for ORF and AA sequence fastas'''
+    '''fix names for longest orf isoform names for ORF sequence fastas'''
     input: 
         fa = rules.pull_longest_paralog_isofrom_ORFs_AAs.output.orf_fa,
         gff = rules.add_introns_gff.output.intron_gff
@@ -301,7 +301,7 @@ rule fix_longest_orf_isoform_orf_names:
     script: "../scripts/rename_sequence_fa_reads.py"
 
 rule fix_longest_orf_isoform_AA_names:
-    '''fix names for longest orf isoform names for ORF and AA sequence fastas'''
+    '''fix names for longest orf isoform names for AA sequence fastas'''
     input: 
         fa = rules.pull_longest_paralog_isofrom_ORFs_AAs.output.aa_fa,
         gff = rules.add_introns_gff.output.intron_gff
