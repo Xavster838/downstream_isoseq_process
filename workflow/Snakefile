@@ -111,7 +111,8 @@ rule get_all_dot_plots:
 rule get_all_paralog_longest_orf_ORF_AA_seqs:
     '''get paralog longest ORF orf and aa sequences'''
     input:
-        fas = get_all_longest_paralog_isoform_orf_aa
+        orf_fas = get_all_longest_paralog_isoform_orf,
+        aa_fas = get_all_longest_paralog_isoform_aa
 
 rule get_all_longest_paralog_isoform_introns:
     '''get paralog longest ORF isoform introns and genomic mRNAs'''
