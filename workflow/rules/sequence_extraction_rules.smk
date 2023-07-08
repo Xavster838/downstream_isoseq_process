@@ -282,7 +282,7 @@ rule get_isoform_ORF_and_AA:
     orfipy {input.mRNA_fa} --dna $( basename "{output.orf_fa}" ) --pep $( basename "{output.aa_fa}") --outdir $( dirname "{output.orf_fa}" ) --min 100 --max 10000 --start ATG
 '''
 
-rule file_longest_orf_isoform_orf_names:
+rule fix_longest_orf_isoform_orf_names:
     '''fix names for longest orf isoform names for ORF and AA sequence fastas'''
     input: 
         fa = rules.pull_longest_paralog_isofrom_ORFs_AAs.output.orf_fa,
