@@ -221,7 +221,7 @@ rule pull_longest_isoform_introns_mRNAs:
     output:
         tmp_isoform_tbl = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoforms_no_ORF.lst"),
         intron_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_intron_sequence.fa"),
-        mRNA_fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_genomic_mRNA_sequence.fa"),
+        mRNA_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_genomic_mRNA_sequence.fa"),
     resources:
         mem_mb = 8000
     threads : 2
@@ -317,7 +317,7 @@ rule fix_longest_orf_isoform_AA_names:
 rule fix_longest_orf_isoform_intron_names:
     '''fix names for longest orf isoform names for AA sequence fastas'''
     input: 
-        fa = pull_longest_isoform_introns_mRNAs.output.intron_fa,
+        fa = rules.pull_longest_isoform_introns_mRNAs.output.intron_fa,
         gff = rules.add_introns_gff.output.intron_gff
     output:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_intron_sequence.fa",
@@ -335,8 +335,8 @@ rule fix_longest_orf_isoform_intron_names:
 rule fix_longest_orf_isoform_mRNA_names:
     '''fix names for longest orf isoform names for AA sequence fastas'''
     input: 
-        fa = pull_longest_isoform_introns_mRNAs.output.intron_fa,
-        gff = rules.add_introns_gff.output.mRNA_fa
+        fa = rules.pull_longest_isoform_introns_mRNAs.output.mRNA_fa,
+        gff = rules.add_introns_gff.output.intron_gff
     output:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_genomic_mRNA_sequence.fa",
         fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_genomic_mRNA_sequence.fa.fai"
