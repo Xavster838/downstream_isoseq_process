@@ -138,6 +138,13 @@ def get_loc_path(wc):
             return config["ref_map_loci"][wc.loc_name]
     return None
 
+def get_can_mRNA_path(wc):
+    '''given a locus name, identify the path in the config variable ref_canonical_mRNA that contains the reference mRNA sequence to map. return path'''
+    if "ref_canonical_mRNA" in config.keys():
+        if wc.loc_name in config["ref_canonical_mRNA"].keys():
+            return config["ref_canonical_mRNA"][wc.loc_name]
+    return None
+
 def get_sample_reference(wc):
     '''given a reference name, like CHM13 or Jim_h1, return the path to that reference identified by one of the samples in the manifest'''
     return [ref_path for ref_path in manifest_df["reference"] if get_nhp_ref_name( ref_path ) == wc.ref2 ][0]
