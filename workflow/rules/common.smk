@@ -132,7 +132,7 @@ def get_all_hg38_collapse(wc):
     return out_paths
 
 def get_loc_path(wc):
-    '''given a locus name, identify the path in the config variable ref_map_fasta that contains the sequence to that locus'''
+    '''given a locus name, identify the path in the config variable ref_map_loci that contains the sequence to that locus'''
     if "ref_map_loci" in config.keys():
         if wc.loc_name in config["ref_map_loci"].keys():
             return config["ref_map_loci"][wc.loc_name]
