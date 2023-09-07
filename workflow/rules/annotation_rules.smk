@@ -42,7 +42,7 @@ sed -i 's/"//g' {output.gff} #get rid of double quotes
 
 # ####    locus specific
 rule annotate_reference_locus:
-    '''given a sequence, map and identify regions on the reference corresponding to that sequence'''
+    '''given a sequence, map and identify regions on the reference corresponding to that sequence. Output bed'''
     input:
         ref = get_sample_reference,
         loc_seq = get_loc_path,
