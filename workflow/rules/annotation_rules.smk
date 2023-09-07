@@ -42,7 +42,7 @@ sed -i 's/"//g' {output.gff} #get rid of double quotes
 
 # ####    locus specific
 rule annotate_reference_locus:
-    '''given a sequence, map and identify regions on the reference corresponding to that sequence'''
+    '''given a sequence, map and identify regions on the reference corresponding to that sequence. Output bed'''
     input:
         ref = get_sample_reference,
         loc_seq = get_loc_path,
@@ -64,6 +64,37 @@ tail -n +6 {output.temp_mapping_psl} | cut -f14,16,17,10,9 | \
     awk 'BEGIN {{FS="\\t"; OFS="\\t"}} {{print $3,$4,$5,"{wildcards.loc_name}" , ".",$1}}' | bedtools sort | awk 'BEGIN {{FS="\\t"; OFS="\\t"}}{{$4=$4"_"NR; print $0}}' | \
 	awk -v min_len={config[min_map_len]} '{{ if (($3 - $2) > min_len) print }}' > {output.mapping_bed}
 """
+
+rule annotate_canonical_ref_mRNA:
+    '''given a canonical mRNA, map and identify regions on the reference corresponding to that mRNA. Output: bed12'''
+    input:
+        ref = get_sample_reference,
+        ref_loc_bed = rules.annotate_reference_locus.output.mapping_bed
+        can_mRNA = get_can_mRNA_path,
+    output:
+        temp_bam = temp( "tmp/ref_mappings/{loc_name}/{ref1}/{ref2}__{loc_name}_canonical_mRNA_mappings.bam" ),
+        bed12 = "reference_annotations/{loc_name}/{ref1}/{ref2}__{loc_name}_canonical_mRNA_mappings.bed12"
+    resources:
+        mem_mb = 4000
+    threads: 4
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
+        ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] ),
+    shell:"""
+minimap2 -a -k19 -w5 --splice -g 2k  -A1 -B2 -O2,32 \
+    -E1,0 -C9 -z200 -ub --junc-bonus=9 --cap-sw-mem=0 --splice-flank=no -G50k \
+    --secondary=yes -N 100 \
+    {input.ref} {input.can_mRNA} | \
+    samtools view -F 2052 -b - | \
+    samtools sort -@ 4 - > {output.temp_bam}
+
+bedtools intersect -a {output.temp_bam} -b {ref_loc_bed} -wa -wb -bed | \
+    awk 'BEGIN{{OFS=FS}}{{$4=$16; print}}' > {output.bed12}
+"""
+
 
 rule subset_alignment_bam_by_locus:
     '''subset alignment bam to reads that overlap annotated regions by annotate_reference_locus'''

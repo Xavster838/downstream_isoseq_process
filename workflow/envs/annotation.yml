@@ -4,6 +4,7 @@ channels:
   - defaults
   - r
 dependencies:
+  - minimap2
   - numpy
   - pandas
   - biopython 
