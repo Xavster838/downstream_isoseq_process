@@ -1,8 +1,10 @@
-manifest : "/net/eichler/vol26/home/guitarfx/software/github_clones/downstream_isoseq_process/.test/test_manifest.txt" #"../.test/test_manifest.txt" 
-Hsa_ref : /net/eichler/vol26/eee_shared/assemblies/hg38/no_alt/hg38.no_alt.fa
-T2T_ref : /net/eichler/vol26/projects/chm13_t2t/nobackups/assemblies/T2T-CHM13v2.fasta
+manifest : "/net/eichler/vol28/home/guitarfx/software/github_clones/downstream_isoseq_process/.test/test_manifest.txt" 
+Hsa_ref : /net/eichler/vol28/eee_shared/assemblies/hg38/no_alt/hg38.no_alt.fa
+T2T_ref : /net/eichler/vol28/projects/chm13_t2t/nobackups/assemblies/T2T-CHM13v2.fasta
 min_read_length : 1000
 min_read_quality : 30
-ref_map_loci : {"TBC1D3" : "/net/eichler/vol26/home/guitarfx/universally_useful_data/TBC1D3/TBC1D3L_sequence_exonUPPER.fa"} #paralog or sequence to map in an assembly 
+extra_minimap_flags : "" #"-G 20k"
+ref_map_loci : {"TBC1D3" : "/net/eichler/vol28/home/guitarfx/universally_useful_data/TBC1D3/TBC1D3L_sequence_exonUPPER.fa"} #paralog or sequence to map in an assembly 
+ref_canonical_mRNA : {"TBC1D3" : "/net/eichler/vol28/home/guitarfx/universally_useful_data/TBC1D3/TBC1D3D_mRNA.fa"}
 min_perID : 98 #minimum percent identity threshold for percent-id dot plots
 min_map_len : 6000 #minimum mapping length for reference mapping (should be smaler than ref_map_loci)
