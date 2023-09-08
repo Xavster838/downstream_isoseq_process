@@ -62,14 +62,14 @@ rule annotate_reference_locus:
 blat -t=dna -q=dna -minScore=100 -maxIntron=500 -minMatch=3 {input.ref} {input.loc_seq} {output.temp_mapping_psl}
 tail -n +6 {output.temp_mapping_psl} | cut -f14,16,17,10,9 | \
     awk 'BEGIN {{FS="\\t"; OFS="\\t"}} {{print $3,$4,$5,"{wildcards.loc_name}" , ".",$1}}' | bedtools sort | awk 'BEGIN {{FS="\\t"; OFS="\\t"}}{{$4=$4"_"NR; print $0}}' | \
-	awk -v min_len={config[min_map_len]} '{{ if (($3 - $2) > min_len) print }}' > {output.mapping_bed}
+    awk -v min_len={config[min_map_len]} '{{ if (($3 - $2) > min_len) print }}' > {output.mapping_bed}
 """
 
 rule annotate_canonical_ref_mRNA:
     '''given a canonical mRNA, map and identify regions on the reference corresponding to that mRNA. Output: bed12'''
     input:
         ref = get_sample_reference,
-        ref_loc_bed = rules.annotate_reference_locus.output.mapping_bed
+        ref_loc_bed = rules.annotate_reference_locus.output.mapping_bed,
         can_mRNA = get_can_mRNA_path,
     output:
         temp_bam = temp( "tmp/ref_mappings/{loc_name}/{ref1}/{ref2}__{loc_name}_canonical_mRNA_mappings.bam" ),
@@ -91,7 +91,7 @@ minimap2 -a -k19 -w5 --splice -g 2k  -A1 -B2 -O2,32 \
     samtools view -F 2052 -b - | \
     samtools sort -@ 4 - > {output.temp_bam}
 
-bedtools intersect -a {output.temp_bam} -b {ref_loc_bed} -wa -wb -bed | \
+bedtools intersect -a {output.temp_bam} -b {input.ref_loc_bed} -wa -wb -bed | \
     awk 'BEGIN{{OFS=FS}}{{$4=$16; print}}' > {output.bed12}
 """
 
