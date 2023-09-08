@@ -186,6 +186,31 @@ rule get_top_paralog_isoforms:
         "../envs/annotation.yml"
     script: "../scripts/get_top_paralog_isoforms.py"
 
+rule get_long_supported_isoforms:
+    '''find the isoforms that retain the majority of exons in canonical mRNA. Return tbl'''
+    input:
+        canonical_bed12 = rules.annotate_canonical_ref_mRNA.output.bed12 ,#canonical mRNA bed12
+        abundance_tbl = rules.collapse_to_isoforms.output.abundance_tbl ,
+        ref_gene_mappings_bed = rules.annotate_reference_locus.output.mapping_bed,
+        isoform_gff = rules.merge_locus_gff_info.output.locus_gff,
+    output:
+        keep_isos_tbl = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_long_supported_isoforms.tbl",
+        keep_isos_lst = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_long_supported_isoforms.lst"
+    resources:
+        mem_mb = 8000
+    threads: 2
+    params:
+        flank_tolerance = 100 #keep isoforms if their alignments are at least within 100bp of canonical mRNA mapping.
+        min_abundance = 3 #only keep isoforms that have at least min_abundance reads in them
+    wildcard_constraints:
+        loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
+        ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] )
+    conda:
+        "../envs/annotation.yml"
+    script: "../scripts/get_long_supported_isoforms.py"
+
+
 rule subset_gff_top_isoforms:
     '''given locus gff, add introns for later extracting sequence'''
     input:
