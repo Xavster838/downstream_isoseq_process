@@ -1,8 +1,2 @@
-.vscode/**
-.snakemake/**
-results/**
-logs/**
-alignments/**
-tmp/**
-.snakemake/**
-**.code-workspace
+.DS_Store
+workflow/.DS_Store
