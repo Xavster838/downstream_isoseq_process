@@ -92,7 +92,7 @@ minimap2 -a -k19 -w5 --splice -g 2k  -A1 -B2 -O2,32 \
     samtools sort -@ 4 - > {output.temp_bam}
 
 bedtools intersect -a {output.temp_bam} -b {input.ref_loc_bed} -wa -wb -bed | \
-    awk 'BEGIN{{OFS=FS}}{{$4=$16; print}}' > {output.bed12}
+    awk -F '\t' 'BEGIN{{OFS=FS}}{{$4=$16; print}}' > {output.bed12}
 """
 
 
