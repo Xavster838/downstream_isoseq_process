@@ -282,6 +282,28 @@ rule pull_longest_paralog_isofrom_ORFs_AAs:
     seqtk subseq {input.aa_fa} {input.lst} > {output.aa_fa}
 ''' 
 
+rule pull_longest_supported_paralog_isofrom_ORFs_AAs:
+    '''given list from rule get_long_supported_isoforms, pull ORF, and AA sequences.'''
+    input:
+        lst = rules.get_long_supported_isoforms.output.keep_isos_lst,
+        orf_fa = rules.get_all_isoform_ORF_and_AA.output.orf_fa ,
+        aa_fa = rules.get_all_isoform_ORF_and_AA.output.aa_fa,
+    output:
+        orf_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_ORF_sequence.fa") ,
+        aa_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_aa_sequence.fa"),
+    resources:
+        mem_mb = 8000
+    threads : 2
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
+    shell:'''
+    seqtk subseq {input.orf_fa} {input.lst} > {output.orf_fa}
+    seqtk subseq {input.aa_fa} {input.lst} > {output.aa_fa}
+''' 
+
 
 rule get_isoform_ORF_and_AA:
     '''given CDS file, predict ORFs.'''
