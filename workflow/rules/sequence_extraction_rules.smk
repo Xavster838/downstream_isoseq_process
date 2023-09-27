@@ -236,6 +236,30 @@ rule pull_longest_isoform_introns_mRNAs:
     seqtk subseq {input.mRNA_fa} {output.tmp_isoform_tbl} > {output.mRNA_fa}
 ''' 
 
+rule pull_longest_supported_isoform_introns_mRNAs:
+    '''given list from annotation rule get_long_supported_isoforms, pull introns and genomic mRNAs sequences.'''
+    input:
+        lst = rules.get_long_supported_isoforms.output.keep_isos_lst,
+        intron_fa = rules.pull_all_isoform_intron_sequence.output.fa,
+        mRNA_fa = rules.pull_all_isoform_genomic_mRNA_sequence.output.fa ,
+    output:
+        tmp_isoform_tbl = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms.lst"),
+        intron_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_intron_sequence.fa"),
+        mRNA_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_genomic_mRNA_sequence.fa"),
+    resources:
+        mem_mb = 8000
+    threads : 2
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
+    shell:'''
+    sed 's/_.*//g' {input.lst} > {output.tmp_isoform_tbl}
+    seqtk subseq {input.intron_fa} {output.tmp_isoform_tbl} > {output.intron_fa}
+    seqtk subseq {input.mRNA_fa} {output.tmp_isoform_tbl} > {output.mRNA_fa}
+''' 
+
 rule pull_longest_paralog_isofrom_ORFs_AAs:
     '''given list from rule get_longest_paralog_isoform_orfs_aa_list, pull ORF, and AA sequences.'''
     input:
