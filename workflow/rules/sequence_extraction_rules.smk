@@ -282,15 +282,42 @@ rule pull_longest_paralog_isofrom_ORFs_AAs:
     seqtk subseq {input.aa_fa} {input.lst} > {output.aa_fa}
 ''' 
 
+rule get_longest_ORF_per_isoform:
+    '''given sorted aa fa, output a list of names of the longest ORFs for each isoform annotated in rule get_all_isoform_ORF_and_AA '''
+    input:
+        sorted_aa_fai = get_longest_paralog_isoform_orfs_aa_list.output.tmp_sorted_fai, #to get only longest reading frames for each
+    output:
+        tmp_fai = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_tmp_longest_iso_aa.fai"),
+        longest_iso_ORF_lst = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__longest_aa.lst")
+    resources:
+        mem_mb = 8000
+    threads: 2
+    log: "logs/{loc_name}__{SMP}__{SPRPOP}__{ref1}__{ref2}__get_longest_ORF_per_isoform.log"
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+    shell:'''
+    #get top (process each paralog separately)
+    mapfile -t paralog_array < <(cut -f 1 {input.sorted_aa_fai} | sort | sed "s/_ORF\.[0-9]\+//g" | sort | uniq) #get array of isoform names
+    # for each isoform, sort and take top and add to list
+    for cur_paralog in "${{paralog_array[@]}}"; do
+        grep "${{cur_paralog}}\." {input.sorted_aa_fai} | sort -nr -k 2,2 > {output.tmp_fai} 
+        top_paralog=$( head -n 1 {output.tmp_fai} | cut -f 1 )
+        printf "${{top_paralog}}\n" >> {output.isoform_list} 2> {log}
+    done
+'''
+
 rule pull_longest_supported_paralog_isofrom_ORFs_AAs:
     '''given list from rule get_long_supported_isoforms, pull ORF, and AA sequences.'''
     input:
         lst = rules.get_long_supported_isoforms.output.keep_isos_lst,
+        longest_iso_aa_lst = rules.get_longest_ORF_per_isoform.output.longest_iso_ORF_lst,
         orf_fa = rules.get_all_isoform_ORF_and_AA.output.orf_fa ,
         aa_fa = rules.get_all_isoform_ORF_and_AA.output.aa_fa,
     output:
         tmp_orf_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__all_ORF_sequence.fa")
         tmp_aa_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__all_aa_sequence.fa")
+        tmp_longest_aa_lst = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__longest_aa.lst"),
         orf_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_ORF_sequence.fa") ,
         aa_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_aa_sequence.fa"),
     resources:
@@ -302,8 +329,8 @@ rule pull_longest_supported_paralog_isofrom_ORFs_AAs:
         ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
     shell:'''
-    sed '/^>/ s/_.*//' {input.orf_fa} > {output.tmp_orf_fa}
-    sed '/^>/ s/_.*//' {input.aa_fa} > {output.tmp_aa_fa}
+    seqtk subseq {input.orf_fa} {input.longest_iso_aa_lst} | sed '/^>/ s/_.*//' > {output.tmp_orf_fa}
+    seqtk subseq {input.aa_fa} {input.longest_iso_aa_lst} | sed '/^>/ s/_.*//' > {output.tmp_aa_fa}
     seqtk subseq {output.tmp_orf_fa} {input.lst} > {output.orf_fa}
     seqtk subseq {output.tmp_aa_fa} {input.lst} > {output.aa_fa}
 ''' 
