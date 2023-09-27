@@ -285,10 +285,10 @@ rule pull_longest_paralog_isofrom_ORFs_AAs:
 rule get_longest_ORF_per_isoform:
     '''given sorted aa fa, output a list of names of the longest ORFs for each isoform annotated in rule get_all_isoform_ORF_and_AA '''
     input:
-        sorted_aa_fai = get_longest_paralog_isoform_orfs_aa_list.output.tmp_sorted_fai, #to get only longest reading frames for each
+        sorted_aa_fai = rules.get_longest_paralog_isoform_orfs_aa_list.output.tmp_sorted_fai, #to get only longest reading frames for each
     output:
         tmp_fai = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_tmp_longest_iso_aa.fai"),
-        longest_iso_ORF_lst = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__longest_aa.lst")
+        longest_iso_ORF_lst = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__longest_iso_ORF.lst")
     resources:
         mem_mb = 8000
     threads: 2
@@ -301,9 +301,9 @@ rule get_longest_ORF_per_isoform:
     mapfile -t paralog_array < <(cut -f 1 {input.sorted_aa_fai} | sort | sed "s/_ORF\.[0-9]\+//g" | sort | uniq) #get array of isoform names
     # for each isoform, sort and take top and add to list
     for cur_paralog in "${{paralog_array[@]}}"; do
-        grep "${{cur_paralog}}\." {input.sorted_aa_fai} | sort -nr -k 2,2 > {output.tmp_fai} 
+        grep "${{cur_paralog}}" {input.sorted_aa_fai} | sort -nr -k 2,2 > {output.tmp_fai} 
         top_paralog=$( head -n 1 {output.tmp_fai} | cut -f 1 )
-        printf "${{top_paralog}}\n" >> {output.isoform_list} 2> {log}
+        printf "${{top_paralog}}\n" >> {output.longest_iso_ORF_lst} 2> {log}
     done
 '''
 
@@ -315,9 +315,8 @@ rule pull_longest_supported_paralog_isofrom_ORFs_AAs:
         orf_fa = rules.get_all_isoform_ORF_and_AA.output.orf_fa ,
         aa_fa = rules.get_all_isoform_ORF_and_AA.output.aa_fa,
     output:
-        tmp_orf_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__all_ORF_sequence.fa")
-        tmp_aa_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__all_aa_sequence.fa")
-        tmp_longest_aa_lst = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__longest_aa.lst"),
+        tmp_orf_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__all_ORF_sequence.fa"),
+        tmp_aa_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__all_aa_sequence.fa"),
         orf_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_ORF_sequence.fa") ,
         aa_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_aa_sequence.fa"),
     resources:
