@@ -120,6 +120,14 @@ rule get_all_longest_paralog_isoform_introns_mNA:
         intron_fas = get_all_longest_paralog_isoform_introns,
         mRNA_fas = get_all_longest_paralog_isoform_mRNA 
 
+
+rule  get_all_longest_supported_isoform_seq:
+    '''get longest supported isoform mRNA for all samples and loci'''
+    input:
+        mRNA_fas =  get_all_longest_supported_isoform_mRNA,
+        orf_fas = get_all_longest_supported_isoform_orf,
+        aa_fas = get_all_longest_supported_isoform_aa
+
 rule all:
     input:
        tmp_fastqs = [f"tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_2.fastq" for SMP, SPRPOP in list(zip(manifest_df["sample"] , manifest_df["superpop"])) ]

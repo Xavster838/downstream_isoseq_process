@@ -237,3 +237,39 @@ def get_all_longest_paralog_isoform_mRNA(wc):
         print(out_paths)
         out_fastas = out_fastas + out_paths
     return out_fastas
+
+# def get_all_longest_supported_isoform_intron(wc):
+#     '''given manifest: get all isoseq paralog longest supported intron sequences'''
+
+def get_all_longest_supported_isoform_mRNA(wc):
+    '''given manifest: get all isoseq paralog longest supported mRNA sequences'''
+    output_string = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_genomic_mRNA_sequence.fa"
+    out_fastas = []
+    for cur_loc in list(config["ref_map_loci"].keys()):
+        print(cur_loc)
+        out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"], ref1 = Path(cur_row["reference"]).stem, ref2 = Path(cur_row["reference"]).stem, loc_name = cur_loc) for i, cur_row in manifest_df.iterrows()]
+        print(out_paths)
+        out_fastas = out_fastas + out_paths
+    return out_fastas
+
+def get_all_longest_supported_isoform_orf(wc):
+    '''given manifest: get all isoseq paralog longest supported orf sequences'''
+    output_string = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_ORF_sequence.fa"
+    out_fastas = []
+    for cur_loc in list(config["ref_map_loci"].keys()):
+        print(cur_loc)
+        out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"], ref1 = Path(cur_row["reference"]).stem, ref2 = Path(cur_row["reference"]).stem, loc_name = cur_loc) for i, cur_row in manifest_df.iterrows()]
+        print(out_paths)
+        out_fastas = out_fastas + out_paths
+    return out_fastas
+
+def get_all_longest_supported_isoform_aa(wc):
+    '''given manifest: get all isoseq paralog longest supported aa sequences'''
+    output_string = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_aa_sequence.fa"
+    out_fastas = []
+    for cur_loc in list(config["ref_map_loci"].keys()):
+        print(cur_loc)
+        out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"], ref1 = Path(cur_row["reference"]).stem, ref2 = Path(cur_row["reference"]).stem, loc_name = cur_loc) for i, cur_row in manifest_df.iterrows()]
+        print(out_paths)
+        out_fastas = out_fastas + out_paths
+    return out_fastas
