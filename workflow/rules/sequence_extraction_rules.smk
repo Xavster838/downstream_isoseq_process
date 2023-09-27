@@ -448,4 +448,57 @@ rule fix_ORF_AA_names:
 
 
 
-# rule get_isoform_aa_sequence:
+# fix longest supported isoform names
+rule fix_longest_supported_isoform_mRNA_names:
+    '''fix names for longest supported isoform names for mRNA sequence fastas'''
+    input: 
+        fa = rules.pull_longest_supported_isoform_introns_mRNAs.output.mRNA_fa,
+        gff = rules.add_introns_gff.output.intron_gff
+    output:
+        fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_genomic_mRNA_sequence.fa",
+        fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_genomic_mRNA_sequence.fa.fai"
+    resources:
+        mem_mb = 8000
+    threads : 2
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
+    script: "../scripts/rename_sequence_fa_reads.py"
+
+rule fix_longest_supported_isoform_ORF_names:
+    '''fix names for longest supported isoform names for mRNA sequence fastas'''
+    input: 
+        fa = rules.pull_longest_supported_paralog_isofrom_ORFs_AAs.output.orf_fa,
+        gff = rules.add_introns_gff.output.intron_gff
+    output:
+        fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_ORF_sequence.fa",
+        fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_ORF_sequence.fa.fai"
+    resources:
+        mem_mb = 8000
+    threads : 2
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
+    script: "../scripts/rename_sequence_fa_reads.py"
+
+rule fix_longest_supported_isoform_aa_names:
+    '''fix names for longest supported isoform names for mRNA sequence fastas'''
+    input: 
+        fa = rules.pull_longest_supported_paralog_isofrom_ORFs_AAs.output.aa_fa,
+        gff = rules.add_introns_gff.output.intron_gff
+    output:
+        fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_aa_sequence.fa",
+        fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_aa_sequence.fa.fai"
+    resources:
+        mem_mb = 8000
+    threads : 2
+    conda:
+        "../envs/annotation.yml"
+    wildcard_constraints:
+        ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
+        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
+    script: "../scripts/rename_sequence_fa_reads.py"
