@@ -43,7 +43,12 @@ rule fold_ref:
         ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
     shell:"""
-    fold -w 80 {input.ref} > {output.tmp_folded_ref}
+    ref_out={input.ref}
+    if (file {input.ref} | grep -q compressed ) ; then
+        gunzip -c {input.ref} > tmp/{wildcards.ref2}_gunzip.fa
+        ref_out=tmp/{wildcards.ref2}_gunzip.fa
+    fi
+    fold -w 80 $ref_out > {output.tmp_folded_ref}
     samtools faidx {output.tmp_folded_ref}
 """
 
@@ -129,6 +134,7 @@ rule pull_all_isoform_genomic_mRNA_sequence:
         ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
     shell:"""
+    mkdir -p $(dirname {output.fa})
     agat_sp_extract_sequences.pl --gff {input.gff} --fasta {input.ref} -t exon --merge --keep_attributes --output {output.fa}
     sed -i 's/[^>]*>\([^ ]*\) \(.*\)/>\\1/' {output.fa} #get rid of extranious info for later running ORFfinder
     samtools faidx {output.fa}
