@@ -11,7 +11,7 @@ regions_path <- snakemake@input[["rgns"]]
 cur_nhp = snakemake@params[['cur_nhp']]
 cur_sample = snakemake@params[['cur_sample']]
 
-tbl = read_tsv(cur_tbl_path)
+tbl = read_tsv(cur_tbl_path) %>% distinct()
 colnames(tbl)[1] = "reference_name"
 regions = read_table(regions_path, col_names = c("seqnames", "start", "stop", "name", ".", "strand"))
 
