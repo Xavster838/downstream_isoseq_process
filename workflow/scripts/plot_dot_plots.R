@@ -22,7 +22,7 @@ regions$gene = regions$name #add gene column for logic I pulled from previous co
 
 #figure out primary alignments by matches column
 tbl = tbl %>% arrange( desc(matches) )
-tbl = tbl %>% group_by(query_name) %>% mutate(alignment_n =  row_number() ) %>% mutate(is_primary = ifelse(alignment_n == 1, yes = TRUE, no = FALSE) ) %>% ungroup() #order alignments by matches and number them as primary, secondary, etc.
+tbl = tbl %>% group_by(query_name) %>% mutate(alignment_n =  row_number() ) %>% mutate(is_primary = ifelse(alignment_flag < 20, yes = TRUE, no = FALSE) ) %>% ungroup() #order alignments by matches and number them as primary, secondary, etc.
 tbl_ranges = makeGRangesFromDataFrame(tbl, keep.extra.columns = T, 
                                       seqnames.field = "reference_name", 
                                       start.field = "reference_start",end.field = "reference_end", strand.field = "strand")
