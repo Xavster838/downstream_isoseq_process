@@ -51,7 +51,7 @@ p1 = ggplot(data = tbl %>% filter(perID_by_events >= MIN_p_THRESH), mapping = ae
   xlab(glue("{cur_nhp} TBC1D3 paralogs identified by mapping")) +
   ylab("percent identity by events") +
   scale_color_discrete(name = "is primary alignment") +
-  scale_color_manual(values = c("#619CFF", "salmon")) +
+  scale_color_manual(values = c("salmon" , "#619CFF")) +
   theme(axis.text.x = element_text(size = 8, angle = 45, vjust = 1.2))
 
 
@@ -72,7 +72,7 @@ tbl2 = left_join(tbl, prim_vs_secondary, by = "query_name" )
 tbl2 = tbl2 %>% mutate(difference_with_secondary = ifelse(is.na(difference_with_secondary), 1, difference_with_secondary)) %>% filter(is_primary)
 p2 = ggplot(data = tbl2 , mapping = aes(x = gene, y = difference_with_secondary)) + 
   geom_jitter(width = 0.1, height = 0,  mapping = aes(color = is_primary)) +
-  scale_color_manual(values = c("#619CFF", "salmon")) +
+  scale_color_manual(values = c("#619CFF")) +
   ggtitle(glue("{cur_nhp} {cur_sample} isoseq: primary vs secondary alignments %-ID")) +
   xlab(glue("{cur_nhp} TBC1D3 paralogs identified by mapping")) +
   ylab("percent identity difference")
