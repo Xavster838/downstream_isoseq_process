@@ -55,12 +55,17 @@ p1 = ggplot(data = tbl %>% filter(perID_by_events >= MIN_p_THRESH), mapping = ae
 
 #plot 2: primary vs secondary plot
 #get stats of secondary vs. primary alignment
-prim_vs_secondary = tbl %>% 
+prim_vs_secondary = tbl %>% group_by(gene, query_name) %>% arrange(desc(perID_by_events)) %>% filter(row_number() == 1 ) %>% ungroup() %>%
+  arrange(query_name, desc(is_primary), perID_by_events)
+
+
+prim_vs_secondary = prim_vs_secondary %>% 
   group_by(query_name) %>% 
-  arrange(perID_by_events) %>% 
+  arrange(desc(is_primary), desc(perID_by_events)) %>% 
   filter(row_number() %in% c(1,2) ) %>%
   summarize(difference_with_secondary = diff(perID_by_events) ) %>%
   ungroup()
+
 tbl2 = left_join(tbl, prim_vs_secondary, by = "query_name" )
 tbl2 = tbl2 %>% mutate(difference_with_secondary = ifelse(is.na(difference_with_secondary), 1, difference_with_secondary)) #make NAs 1
 p2 = ggplot(data = tbl2 , mapping = aes(x = gene, y = difference_with_secondary)) + 
