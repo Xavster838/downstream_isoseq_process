@@ -67,7 +67,7 @@ for transcript_id, row in trans_df.iterrows():
         missed += 1
         continue
     cur_aln = bed12.loc[row.paralog]   
-    if(row.start <= cur_aln.start + 100 and row.end >= cur_aln.end - 100):
+    if(row.start <= cur_aln.start + FLANK_TOLERANCE and row.end >= cur_aln.end - FLANK_TOLERANCE):
         length_filter_isos = pd.concat([length_filter_isos, row.to_frame().T] )
     else:
         missed += 1
