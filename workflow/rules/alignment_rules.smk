@@ -48,8 +48,8 @@ rule split_fastq:
     output:
         fastq = temp(expand("tmp/iso_fastqs/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}.fastq", frac=fracIDs)),
     resources:
-        mem_mb=8000
-    threads:1
+        mem_mb=16000
+    threads:2
     run:
         import gzip
         from Bio import SeqIO
@@ -112,17 +112,16 @@ rule mm_index_hg38:
 
 #get alignment to reference (NHP not T2T or hg38)
 ref_link_list = [ get_species_ref_link(cur_row) for i, cur_row in manifest_df.iterrows() ]
-nhp_ref_dict = { r['ref_name'] : r['ref_path'] for r in ref_link_list}
 
-def get_species_sample_ref_path(wc):
-    '''given species sample combo, return reference fasta to index.'''
-    return nhp_ref_dict[wc['ref_name']]
+def get_manifest_ref_path(wc):
+    '''for mm_index_nhp_ref: get original assembly path'''
+    return get_nhp_ref(manifest_df.loc[wc.SMP,:])
 
 rule mm_index_nhp_ref:
     input:
-        fasta = get_species_sample_ref_path,
+        fasta = get_sample_reference 
     output:
-        mmi = "mmdb/{SPRPOP}_{ref_name}_ref.mmi" # get_species_ref_path 
+        mmi = "mmdb/{SMP}/{SPRPOP}_{ref_name}_ref.mmi" # get_species_ref_path 
     wildcard_constraints:
         ref_name = "|".join( [Path(x).stem for x in manifest_df['reference']] )
     resources:
@@ -140,7 +139,7 @@ rule map_mm:
         fasta = "tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_{frac}.fastq",  #rules.split_fastq.output.fastq , #"iso_fastqs/{species}/{sample}/{species}_{sample}_{frac}.fastq" ,  #"iso_fastas/{species}/{read}_{frac}.fasta",
         mmi = get_species_ref_path 
     output:
-        bam = temp("tmp/alignments/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{frac}_{ref_name}.mm.bam"),
+        bam = temp("tmp/alignments/{SMP}/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{frac}_{ref_name}.mm.bam"),
     benchmark:
         "benchmarks/{SMP}_{SPRPOP}_FILTERED_{frac}_{ref_name}.mm.bam.bench",
     wildcard_constraints:
