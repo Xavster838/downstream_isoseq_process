@@ -6,7 +6,7 @@ nhp_ref_dict = { r['ref_name'] : r['ref_path'] for r in ref_link_list}
 rule pull_paralog_genomic_sequence:
     '''given locus annotations from annotation_rule. pull full genomic sequence'''
     input:
-        ref  = get_species_sample_ref_path,
+        ref  = get_sample_reference, #get_species_sample_ref_path,
         locus_bed = "reference_annotations/{loc_name}/{ref1}/{ref2}__{loc_name}_mappings.bed"
     output:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_genomic_sequence.fa" ,
@@ -27,10 +27,10 @@ rule pull_paralog_genomic_sequence:
 rule fold_ref:
     '''make sure references are folded to 80 characters or less per line. AGAT does not work with single line fastas.'''
     input:
-        ref  = get_species_sample_ref_path,
+        ref  = get_sample_reference #get_species_sample_ref_path,
     output:
-        tmp_folded_ref = temp("tmp/{ref2}__folded.fa"),
-        fai = temp("tmp/{ref2}__folded.fa.fai"),
+        tmp_folded_ref = temp("tmp/{SMP}/{ref2}__folded.fa"),
+        fai = temp("tmp/{SMP}/{ref2}__folded.fa.fai"),
     resources:
         mem_mb = 8000
     threads : 2
