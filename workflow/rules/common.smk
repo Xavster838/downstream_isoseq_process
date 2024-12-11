@@ -21,9 +21,9 @@ def get_species_ref_link(manifest_row):
 
 def get_species_ref_path(wc):
     '''given sample species combo, return all nhp_ref mmi_index to use as reference'''
-    ref_mmi_string = "mmdb/{superpop}_{ref_name}_ref.mmi"
+    ref_mmi_string = "mmdb/{SMP}/{superpop}_{ref_name}_ref.mmi"
     ref_dict = get_species_ref_link(manifest_df.loc[ wc['SMP'] ])
-    ref_out_name = ref_mmi_string.format(superpop = ref_dict['superpop'], ref_name = ref_dict['ref_name'])
+    ref_out_name = ref_mmi_string.format(superpop = ref_dict['superpop'], ref_name = ref_dict['ref_name'], SMP = wc['SMP'])
     return ref_out_name
 
 
@@ -75,7 +75,7 @@ def get_nhp_ref_input( wc ):
     cur_sample = wc.SMP    
     prev_aln = get_col_bam(cur_sample, alignment_type = "sample_reference")
     if not prev_aln:
-        return expand("tmp/alignments/{{ref_name}}/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{ref_name}}.mm.bam" , frac = fracIDs)
+        return expand("tmp/alignments/{{SMP}}/{{ref_name}}/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{ref_name}}.mm.bam" , frac = fracIDs)
     return prev_aln
 
 
@@ -147,7 +147,7 @@ def get_can_mRNA_path(wc):
 
 def get_sample_reference(wc):
     '''given a reference name, like CHM13 or Jim_h1, return the path to that reference identified by one of the samples in the manifest'''
-    return [ref_path for ref_path in manifest_df["reference"] if get_nhp_ref_name( ref_path ) == wc.ref2 ][0]
+    return manifest_df.loc[wc.SMP, "reference"] #[ref_path for ref_path in manifest_df["reference"] if get_nhp_ref_name( ref_path ) == wc.ref2 ][0]
 
 def get_all_intron_fas(wc):
     '''given manifest, get all intron fastas'''
