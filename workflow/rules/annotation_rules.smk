@@ -47,8 +47,8 @@ rule annotate_reference_locus:
         ref = get_sample_reference,
         loc_seq = get_loc_path,
     output:
-        temp_mapping_psl = temp( "tmp/ref_mappings/{loc_name}/{ref1}/{ref2}__{loc_name}.psl" ),
-        mapping_bed = "reference_annotations/{loc_name}/{ref1}/{ref2}__{loc_name}_mappings.bed"
+        temp_mapping_psl = temp( "tmp/ref_mappings/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}.psl" ),
+        mapping_bed = "reference_annotations/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}_mappings.bed"
     resources:
         mem_mb = 4000
     threads: 4
@@ -72,8 +72,8 @@ rule annotate_canonical_ref_mRNA:
         ref_loc_bed = rules.annotate_reference_locus.output.mapping_bed,
         can_mRNA = get_can_mRNA_path,
     output:
-        temp_bam = temp( "tmp/ref_mappings/{loc_name}/{ref1}/{ref2}__{loc_name}_canonical_mRNA_mappings.bam" ),
-        bed12 = "reference_annotations/{loc_name}/{ref1}/{ref2}__{loc_name}_canonical_mRNA_mappings.bed12"
+        temp_bam = temp( "tmp/ref_mappings/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}_canonical_mRNA_mappings.bam" ),
+        bed12 = "reference_annotations/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}_canonical_mRNA_mappings.bed12"
     resources:
         mem_mb = 4000
     threads: 4
@@ -100,7 +100,7 @@ rule subset_alignment_bam_by_locus:
     '''subset alignment bam to reads that overlap annotated regions by annotate_reference_locus'''
     input:
         bam = "alignments/{SMP}/{ref1}/{SMP}_{SPRPOP}_FILTERED_{ref2}.mm.bam",
-        ref_loc_bed = "reference_annotations/{loc_name}/{ref1}/{ref2}__{loc_name}_mappings.bed"
+        ref_loc_bed = rules.annotate_reference_locus.output.mapping_bed 
     output:
         bam = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_mappings.bam",
         bai = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_mappings.bam.bai"
