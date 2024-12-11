@@ -2,9 +2,6 @@
 ref_link_list = [ get_species_ref_link(cur_row) for i, cur_row in manifest_df.iterrows() ]
 nhp_ref_dict = { r['ref_name'] : r['ref_path'] for r in ref_link_list}
 
-def get_species_sample_ref_path(wc):
-    '''given species sample combo, return reference fasta to index.'''
-    return nhp_ref_dict[wc['ref2']]
 
 rule pull_paralog_genomic_sequence:
     '''given locus annotations from annotation_rule. pull full genomic sequence'''
