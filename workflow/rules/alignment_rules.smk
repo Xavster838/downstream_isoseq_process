@@ -15,13 +15,19 @@ rule fastq_from_bam:
        # chekc if bam
        if(input["read"][-4:]==".bam"):
            shell("bedtools bamtofastq -i {input.read} -fq /dev/stdout | gzip > {output.fastq}")
+       elif(input["read"][-5:]==".cram"):
+           cram_ref = get_cram_ref(input['read'])
+           if(cram_ref == -1):
+              raise Exception(f"Input Error : could not identify reference of cram file : {input.read}")
+           else:
+              shell("samtools fastq -T {cram_ref} {input.read} > {output.fastq}")
        elif(input["read"][-6:]==".fastq" or input["read"][-3:]==".fq"):
            shell("cp {input.read} {output.fastq}")
            shell("gzip {output.fastq}")
        elif( input["read"][-9:]==".fastq.gz" or input["read"][-6:]==".fq.gz" ):
            shell("ln -s {input.read} {output.fastq}")
        else:
-           raise Exception(f"Input Error : iso_seq supported formats are fastqs and bams. File passed : {input.read}")
+           raise Exception(f"Input Error : iso_seq supported formats are fastqs, bams, and crams. File passed : {input.read}")
 
 
 rule filter_fastq:
