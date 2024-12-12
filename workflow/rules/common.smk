@@ -1,4 +1,28 @@
 #common functions I need for all snakemake
+def get_cram_ref(cram_file):
+  '''given a cram file, find the first SQ line and print out the reference that was used for it'''
+  try:
+      # Run samtools to get the header
+      result = subprocess.run(
+          ["samtools", "view", "-H", cram_file],
+          capture_output=True,
+          text=True,
+          check=True
+      )
+      # Split the output into lines and search for the first @SQ line
+      for line in result.stdout.splitlines():
+          if line.startswith("@SQ"):
+              # Look for the 'UR:' field
+              fields = line.split("\t")
+              for field in fields:
+                  if field.startswith("UR:"):
+                      # Return the path after 'UR:'
+                      return field[3:]
+      return "-1"  # If no @SQ line or UR field is found
+  except subprocess.CalledProcessError as e:
+      print(f"Error running samtools: {e}")
+      return "-1"
+
 def get_flnc(wc):
   '''given species sample info, find flnc file from manifest.'''
   return manifest_df.loc[wc.SMP].isoseq_flnc
