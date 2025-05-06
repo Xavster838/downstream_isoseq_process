@@ -25,7 +25,7 @@ def get_cram_ref(cram_file):
 
 def get_flnc(wc):
   '''given species sample info, find flnc file from manifest.'''
-  return manifest_df.loc[wc.SMP].isoseq_flnc
+  return manifest_df.loc[wc.SMP].isoseq_flnc or get_col_bam(wc)
 
 #functions to process and get information about NHP reference.
 def get_nhp_ref(manifest_row):
