@@ -38,6 +38,7 @@ rule filter_fastq:
     input:
         fastq = rules.fastq_from_bam.output.fastq
     output:
+        uncompressed = temp("tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED.fastq"),
         fastq = temp("tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED.fastq.gz")
     resources:
         mem_mb = 8000,
@@ -49,7 +50,8 @@ rule filter_fastq:
         min_len = config['min_read_length'] ,
         min_qual = config['min_read_quality']
     shell:'''
-        seqkit seq -j {threads} --min-len {params.min_len} --min-qual {params.min_qual} {input.fastq} -o - | gzip -c > {output.fastq}
+        seqkit seq -j {threads} --min-len {params.min_len} --min-qual {params.min_qual} {input.fastq} > {output.uncompressed} 
+        gzip -c {output.uncompressed} > {output.fastq}
 '''
 
 fracIDs=list(range(20))
