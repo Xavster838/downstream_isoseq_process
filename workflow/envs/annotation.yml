@@ -4,6 +4,29 @@ channels:
   - defaults
   - r
 dependencies:
+  - perl>=5.26.2 #=5.32.0
+  - agat #=0.4.0
+  - perl-bioperl-core
+  - perl-carp
+  - perl-clone
+  - perl-data-dumper
+  - perl-exporter
+  - perl-file-path
+  - perl-file-share
+  - perl-file-sharedir-install
+  - perl-findbin
+  - perl-getopt-long
+  - perl-graph
+  - perl-libwww-perl
+  - perl-list-moreutils
+  - perl-lwp-protocol-https
+  - perl-moose
+  - perl-pod-usage
+  - perl-sort-naturally
+  - perl-statistics-r
+  - perl-term-progressbar
+  - perl-text-wrap
+  - perl-yaml
   - minimap2
   - numpy
   - pandas
@@ -14,9 +37,7 @@ dependencies:
   - blat=36
   - bedtools #=2.31.0
   - samtools #=1.17  
-  - perl>=5.26.2 #=5.32.0
   - pcre2 #=10.39
   - r-base=4.1.2
-  - agat #=0.4.0
   - orfipy
   - seqtk
