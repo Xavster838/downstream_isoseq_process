@@ -5,6 +5,7 @@ channels:
 dependencies:
   - minimap2
   - samtools=1.17
+  - bedtools=2.31.1
   - seqkit
   - biopython
   - regex
