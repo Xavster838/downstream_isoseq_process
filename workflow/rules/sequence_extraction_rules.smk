@@ -12,7 +12,8 @@ rule pull_paralog_genomic_sequence:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_genomic_sequence.fa" ,
         fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_genomic_sequence.fa.fai"
     resources:
-        mem_mb = 4000
+        mem_mb = 4000,
+        runtime_hrs = 4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -32,7 +33,8 @@ rule fold_ref:
         tmp_folded_ref = temp("tmp/{SMP}/{ref2}__folded.fa"),
         fai = temp("tmp/{SMP}/{ref2}__folded.fa.fai"),
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -57,7 +59,8 @@ rule add_introns_gff:
         temp_intron_gff = temp("tmp/alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_all_collapsed_withIntrons.gff"),
         intron_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_all_collapsed_withIntrons.gff"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads: 2
     wildcard_constraints:
         loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
@@ -79,7 +82,8 @@ rule pull_isoform_intronic_sequence:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_intronic_sequence.fa" ,
         fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_intronic_sequence.fa.fai"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -101,7 +105,8 @@ rule pull_all_isoform_intron_sequence:
         fa = "tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_intron_sequence.fa", 
         fai = "tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_intron_sequence.fa.fai"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -123,7 +128,8 @@ rule pull_all_isoform_genomic_mRNA_sequence:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_exon_sequence.fa", 
         fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_exon_sequence.fa.fai"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -147,7 +153,8 @@ rule pull_isoform_genomic_mRNA_sequence:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_exon_sequence.fa" ,
         fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_exon_sequence.fa.fai"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -170,7 +177,8 @@ rule get_all_isoform_ORF_and_AA:
         aa_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_aa_sequence.fa"),
         aa_fai = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_aa_sequence.fa.fai"),
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -194,7 +202,8 @@ rule get_longest_paralog_isoform_orfs_aa_list:
         tmp_sorted_fai = temp("sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_all_aa_sequence_SORTED.fa.fai"),
         tmp_fai = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_tmp.fai")
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     log: "logs/{loc_name}__{SMP}__{SPRPOP}__{ref1}__{ref2}__get_longest_paralog_isoform_orfs_aa_list.log"
     conda:
@@ -226,7 +235,8 @@ rule pull_longest_isoform_introns_mRNAs:
         intron_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_intron_sequence.fa"),
         mRNA_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_genomic_mRNA_sequence.fa"),
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -250,7 +260,8 @@ rule pull_longest_supported_isoform_introns_mRNAs:
         intron_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_intron_sequence.fa"),
         mRNA_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_genomic_mRNA_sequence.fa"),
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -273,7 +284,8 @@ rule pull_longest_paralog_isofrom_ORFs_AAs:
         orf_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_ORF_sequence.fa") ,
         aa_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_aa_sequence.fa"),
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -293,7 +305,8 @@ rule get_longest_ORF_per_isoform:
         tmp_fai = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_tmp_longest_iso_aa.fai"),
         longest_iso_ORF_lst = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__longest_iso_ORF.lst")
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads: 2
     log: "logs/{loc_name}__{SMP}__{SPRPOP}__{ref1}__{ref2}__get_longest_ORF_per_isoform.log"
     conda:
@@ -323,7 +336,8 @@ rule pull_longest_supported_paralog_isofrom_ORFs_AAs:
         orf_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_ORF_sequence.fa") ,
         aa_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_aa_sequence.fa"),
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -346,7 +360,8 @@ rule get_isoform_ORF_and_AA:
         orf_fa = temp( "tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_ORF_sequence.fa" ) ,
         aa_fa = temp("tmp/sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_aa_sequence.fa"),
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -366,7 +381,8 @@ rule fix_longest_orf_isoform_orf_names:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_ORF_sequence.fa",
         fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_ORF_sequence.fa.fai"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -384,7 +400,8 @@ rule fix_longest_orf_isoform_AA_names:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_aa_sequence.fa",
         fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_aa_sequence.fa.fai"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -402,7 +419,8 @@ rule fix_longest_orf_isoform_intron_names:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_intron_sequence.fa",
         fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_intron_sequence.fa.fai"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -420,7 +438,8 @@ rule fix_longest_orf_isoform_mRNA_names:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_genomic_mRNA_sequence.fa",
         fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_longest_paralog_isoform_genomic_mRNA_sequence.fa.fai"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -440,7 +459,8 @@ rule fix_ORF_AA_names:
         aa_fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_aa_sequence.fa",
         aa_fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}_aa_sequence.fa.fai",
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -461,7 +481,8 @@ rule fix_longest_supported_isoform_mRNA_names:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_genomic_mRNA_sequence.fa",
         fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_genomic_mRNA_sequence.fa.fai"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -479,7 +500,8 @@ rule fix_longest_supported_isoform_ORF_names:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_ORF_sequence.fa",
         fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_ORF_sequence.fa.fai"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -497,7 +519,8 @@ rule fix_longest_supported_isoform_aa_names:
         fa = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_aa_sequence.fa",
         fai = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_aa_sequence.fa.fai"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
