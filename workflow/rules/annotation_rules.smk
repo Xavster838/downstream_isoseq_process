@@ -5,7 +5,8 @@ rule get_alignment_stats:
     output:
         stats = "alignments/{SMP}/{ref1}/stats/{SMP}_{SPRPOP}_FILTERED_{ref2}.mm.bam.stats.tbl"
     resources:
-        mem_mb = 4000
+        mem_mb = 4000,
+        runtime_hrs=4
     threads : 2
     conda:
         "../envs/annotation.yml"
@@ -26,7 +27,8 @@ rule collapse_to_isoforms:
     log:
         "logs/isoform_collapse/{SMP}_{SPRPOP}_FILTERED_{ref1}_{ref2}.collapse.log"
     resources:
-        mem_mb = 4000
+        mem_mb = 4000,
+        runtime_hrs=4
     threads : 4
     conda:
         "../envs/annotation.yml"
@@ -50,7 +52,8 @@ rule annotate_reference_locus:
         temp_mapping_psl = temp( "tmp/ref_mappings/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}.psl" ),
         mapping_bed = "reference_annotations/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}_mappings.bed"
     resources:
-        mem_mb = 4000
+        mem_mb = 4000,
+        runtime_hrs=4
     threads: 4
     conda:
         "../envs/annotation.yml"
@@ -75,7 +78,8 @@ rule annotate_canonical_ref_mRNA:
         temp_bam = temp( "tmp/ref_mappings/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}_canonical_mRNA_mappings.bam" ),
         bed12 = "reference_annotations/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}_canonical_mRNA_mappings.bed12"
     resources:
-        mem_mb = 4000
+        mem_mb = 4000,
+        runtime_hrs=4
     threads: 4
     conda:
         "../envs/annotation.yml"
@@ -105,7 +109,8 @@ rule subset_alignment_bam_by_locus:
         bam = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_mappings.bam",
         bai = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_mappings.bam.bai"
     resources: 
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads: 2
     wildcard_constraints:
         loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
@@ -125,7 +130,8 @@ rule get_locus_alignment_stats:
     output:
         stats = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_mappings.bam.stats.tbl"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads: 2
     wildcard_constraints:
         loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
@@ -156,7 +162,8 @@ rule merge_locus_gff_info:
     output:
         locus_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed.gff"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads: 2
     wildcard_constraints:
         loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
@@ -176,7 +183,8 @@ rule get_top_paralog_isoforms:
     output:
         tbl = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_top_paralog_isoforms.tbl"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads: 2
     wildcard_constraints:
         loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
@@ -194,7 +202,8 @@ rule subset_gff_top_isoforms:
     output:
         subset_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_topIsoforms.gff"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads: 2
     wildcard_constraints:
         loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
@@ -221,7 +230,8 @@ rule add_introns_locus_gff:
         temp_intron_gff = temp("tmp/alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons.gff"),
         intron_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons_topIsoforms.gff"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads: 2
     wildcard_constraints:
         loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
@@ -242,7 +252,8 @@ rule add_introns_to_isoform_gff:
         temp_intron_gff = temp("tmp/alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons.gff"),
         intron_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed_withIntrons.gff"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads: 2
     wildcard_constraints:
         loc_name = "|".join( list(config["ref_map_loci"].keys() ) ),
@@ -266,7 +277,8 @@ rule get_long_supported_isoforms:
         keep_isos_tbl = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_long_supported_isoforms.tbl",
         keep_isos_lst = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_long_supported_isoforms.lst"
     resources:
-        mem_mb = 8000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads: 2
     params:
         flank_tolerance = 100 ,#keep isoforms if their alignments are at least within 100bp of canonical mRNA mapping.

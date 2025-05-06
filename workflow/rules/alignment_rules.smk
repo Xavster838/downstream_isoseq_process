@@ -5,7 +5,8 @@ rule fastq_from_bam:
     output:
         fastq = temp("tmp/{SMP}_{SPRPOP}.fastq.gz"),
     resources:
-        mem_mb=8000
+        mem_mb=8000,
+        runtime_hrs=2
     # conda:
     #     "../envs/alignment.yml"
     log:
@@ -36,7 +37,8 @@ rule filter_fastq:
     output:
         fastq = temp("tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED.fastq.gz")
     resources:
-        mem_mb = 4000
+        mem_mb = 8000,
+        runtime_hrs=4
     threads : 4
     conda:
         "../envs/alignment.yml"
@@ -54,7 +56,8 @@ rule split_fastq:
     output:
         fastq = temp(expand("tmp/iso_fastqs/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}.fastq", frac=fracIDs)),
     resources:
-        mem_mb=16000
+        mem_mb=16000,
+        runtime_hrs=4
     threads:2
     run:
         import gzip
@@ -87,7 +90,8 @@ rule mm_index_t2t:
     output:
         mmi = "mmdb/{t2t_version}_ref.mmi",
     resources:
-        mem_mb=8000
+        mem_mb=8000,
+        runtime_hrs=10
     conda:
         "../envs/alignment.yml"
     log:
@@ -105,7 +109,8 @@ rule mm_index_hg38:
     output:
         mmi = "mmdb/hg38_ref.mmi",
     resources:
-        mem_mb=8000
+        mem_mb=8000,
+        runtime_hrs=10
     conda:
         "../envs/alignment.yml"
     log:
@@ -131,7 +136,8 @@ rule mm_index_nhp_ref:
     wildcard_constraints:
         ref_name = "|".join( [Path(x).stem for x in manifest_df['reference']] )
     resources:
-        mem_mb = 10000
+        mem_mb = 10000,
+        runtime_hrs=10
     conda:
         "../envs/alignment.yml"
     threads:4
@@ -153,6 +159,7 @@ rule map_mm:
     resources:
         mem_mb= 4000 , #lambda wildcards, attempt: 3 + 2 * attempt,
         mem_sw=lambda wildcards, attempt: 3 + 0 * attempt, # the mmi index is ~ 7Gb for a hg38
+        runtime_hrs=10
     conda:
         "../envs/alignment.yml"
     threads: 8
@@ -170,7 +177,8 @@ rule mergeBams:
         bam= "alignments/{SMP}/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
         bai= "alignments/{SMP}/{ref_name}/{SMP}_{SPRPOP}_FILTERED_{ref_name}.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
     resources:
-        mem_mb = 8000 #lambda wildcards, attempt: 8 + 8 * attempt,
+        mem_mb = 8000, #lambda wildcards, attempt: 8 + 8 * attempt,
+        runtime_hrs=10
     conda:
         "../envs/alignment.yml"
     wildcard_constraints:
@@ -204,6 +212,7 @@ rule map_mm_t2t:
     resources:
         mem_mb= 4000 , #lambda wildcards, attempt: 3 + 2 * attempt,
         mem_sw=lambda wildcards, attempt: 3 + 0 * attempt, # the mmi index is ~ 7Gb for a hg38
+        runtime_hrs=10
     conda:
         "../envs/alignment.yml"
     threads: 8
@@ -221,7 +230,8 @@ rule mergeBams_t2t:
         bam= "alignments/{SMP}/t2t/{SMP}_{SPRPOP}_FILTERED_{t2t_version}.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
         bai= "alignments/{SMP}/t2t/{SMP}_{SPRPOP}_FILTERED_{t2t_version}.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
     resources:
-        mem_mb = 8000 #lambda wildcards, attempt: 8 + 8 * attempt,
+        mem_mb = 8000, #lambda wildcards, attempt: 8 + 8 * attempt,
+        runtime_hrs=10
     conda:
         "../envs/alignment.yml"
     wildcard_constraints:
@@ -249,6 +259,7 @@ rule map_mm_hg38:
     resources:
         mem_mb= 4000 , #lambda wildcards, attempt: 3 + 2 * attempt,
         mem_sw=lambda wildcards, attempt: 3 + 0 * attempt, # the mmi index is ~ 7Gb for a hg38
+        runtime_hrs=10
     conda:
         "../envs/alignment.yml"
     threads: 8
@@ -266,7 +277,8 @@ rule mergeBams_hg38:
         bam= "alignments/{SMP}/hg38/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam", #"../aln_2_species_own_ref_clr/{species}/{read}.bam",
         bai= "alignments/{SMP}/hg38/{SMP}_{SPRPOP}_FILTERED_hg38.mm.bam.bai" #"../aln_2_species_own_ref_clr/{species}/{read}.bam.bai",
     resources:
-        mem_mb = 8000 #lambda wildcards, attempt: 8 + 8 * attempt,
+        mem_mb = 8000, #lambda wildcards, attempt: 8 + 8 * attempt,
+        runtime_hrs=10
     conda:
         "../envs/alignment.yml"
     threads: 4
