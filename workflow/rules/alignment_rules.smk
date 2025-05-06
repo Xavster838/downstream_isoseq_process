@@ -1,9 +1,10 @@
 #these are the rules to align isoseq CCS libraries (fastq or unmapped bam) to the T2T and the associated NHP reference.
 rule fastq_from_bam:
+    '''get fastq from flnc bam file... or T2T bam file'''
     input:
         read = get_flnc
     output:
-        fastq = temp("tmp/{SMP}_{SPRPOP}.fastq.gz"),
+        fastq = temp("tmp/{SMP}_{SPRPOP}.fastq"),
     resources:
         mem_mb=8000,
         runtime_hrs=2
@@ -15,7 +16,9 @@ rule fastq_from_bam:
     run:
        # chekc if bam
        if(input["read"][-4:]==".bam"):
-           shell("bedtools bamtofastq -i {input.read} -fq /dev/stdout | gzip > {output.fastq}")
+           shell("samtools fastq -@ {threads} {input.read} > {output.fastq} 2> {log}")
+       elif(input["read"][-4:]==".sam"):
+           shell("samtools fastq {input.read} > {output.fastq} 2> {log} ")
        elif(input["read"][-5:]==".cram"):
            cram_ref = get_cram_ref(input['read'])
            if(cram_ref == -1):
@@ -24,9 +27,9 @@ rule fastq_from_bam:
               shell("samtools fastq -T {cram_ref} {input.read} > {output.fastq}")
        elif(input["read"][-6:]==".fastq" or input["read"][-3:]==".fq"):
            shell("cp {input.read} {output.fastq}")
-           shell("gzip {output.fastq}")
+           #shell("gzip {output.fastq}")
        elif( input["read"][-9:]==".fastq.gz" or input["read"][-6:]==".fq.gz" ):
-           shell("ln -s {input.read} {output.fastq}")
+           shell("gunzip -c {input.read} > {output.fastq}")
        else:
            raise Exception(f"Input Error : iso_seq supported formats are fastqs, bams, and crams. File passed : {input.read}")
 
