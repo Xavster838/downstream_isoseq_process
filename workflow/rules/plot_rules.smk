@@ -1,7 +1,7 @@
 rule get_iso_dot_plots:
     input:
         tbl = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_mappings.bam.stats.tbl" , #rules.get_locus_alignment_stats.output.stats,
-        rgns = rules.annotate_reference_locus.output.mapping_bed
+        rgns = rules.annotate_reference_locus.output.loc_bed
     output:
         plt = "plots/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_isoseq_dotplots.pdf"
     resources:
