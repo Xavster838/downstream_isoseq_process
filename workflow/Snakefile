@@ -129,6 +129,11 @@ rule  get_all_longest_supported_isoform_seq:
         orf_fas = get_all_longest_supported_isoform_orf,
         aa_fas = get_all_longest_supported_isoform_aa
 
+rule get_all_annotation_reference_loci:
+    '''map all sequences from yaml ref_map_loci to all references in isoseq manifest references.'''
+    input:
+        all_loc_fas= get_all_ref_map_loci #"reference_annotations/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}_mappings.bed"
+
 rule all:
     input:
        tmp_fastqs = [f"tmp/iso_fastqs/{SMP}_{SPRPOP}_FILTERED_2.fastq" for SMP, SPRPOP in list(zip(manifest_df["sample"] , manifest_df["superpop"])) ]

@@ -81,7 +81,7 @@ def get_col_bam(cur_sample , alignment_type = "sample_reference"):
         aln_col = "isoseq_hg38_aligned_bam"
     else:
         raise ValueError(f"Invalid alignment_type argument: can only be either: ['sample_reference', 'T2T', 'hg38']: passed: {alignment_type} ")
-    cur_aln_path = manifest_df.loc[cur_sample][aln_col]
+    cur_aln_path = manifest_df.loc[ cur_sample ][aln_col]
     if isinstance( cur_aln_path, str ):
         if(os.path.exists(cur_aln_path)):
             if( os.path.splitext(cur_aln_path)[1] == ".bam" ):
@@ -290,6 +290,17 @@ def get_all_longest_supported_isoform_orf(wc):
 def get_all_longest_supported_isoform_aa(wc):
     '''given manifest: get all isoseq paralog longest supported aa sequences'''
     output_string = "sequence/{loc_name}/{SMP}/{ref1}/{SMP}_{SPRPOP}_{ref2}__{loc_name}__long_supported_isoforms_aa_sequence.fa"
+    out_fastas = []
+    for cur_loc in list(config["ref_map_loci"].keys()):
+        print(cur_loc)
+        out_paths = [ output_string.format(SMP = cur_row["sample"], SPRPOP = cur_row["superpop"], ref1 = Path(cur_row["reference"]).stem, ref2 = Path(cur_row["reference"]).stem, loc_name = cur_loc) for i, cur_row in manifest_df.iterrows()]
+        print(out_paths)
+        out_fastas = out_fastas + out_paths
+    return out_fastas
+
+def get_all_ref_map_loci(wc):
+    '''given manifest: get all isoseq paralog longest supported aa sequences'''
+    output_string = "reference_annotations/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}_mappings.bed"
     out_fastas = []
     for cur_loc in list(config["ref_map_loci"].keys()):
         print(cur_loc)
