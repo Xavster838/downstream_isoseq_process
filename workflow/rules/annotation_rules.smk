@@ -65,10 +65,8 @@ rule annotate_reference_locus:
         ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
         ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] ),
     shell:"""
-blat -t=dna -q=dna -minScore=100 -maxIntron=500 -minMatch=3 {input.ref} {input.loc_seq} {output.temp_mapping_psl}
-tail -n +6 {output.temp_mapping_psl} | cut -f14,16,17,10,9 | \
-    awk 'BEGIN {{FS="\\t"; OFS="\\t"}} {{print $3,$4,$5,"{wildcards.loc_name}" , ".",$1}}' | bedtools sort | awk 'BEGIN {{FS="\\t"; OFS="\\t"}}{{$4=$4"_"NR; print $0}}' | \
-    awk -v min_len={config[min_map_len]} '{{ if (($3 - $2) > min_len) print }}' > {output.mapping_bed}
+minimap2 -x asm20 --secondary=yes -p 0.8 --eqx -t {threads} -r 500 -K 100M {input.ref} {input.loc_seq} | 
+	awk -v min_size={params.min_aln_size} 'BEGIN{{OFS="\\t"}} ($9 - $8 >= min_size) {{print $6, $8, $9, $1, $10, $5}}' > {output.loc_bed}
 """
 
 rule annotate_canonical_ref_mRNA:
