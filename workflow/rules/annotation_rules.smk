@@ -73,7 +73,7 @@ rule annotate_canonical_ref_mRNA:
     '''given a canonical mRNA, map and identify regions on the reference corresponding to that mRNA. Output: bed12'''
     input:
         ref = get_sample_reference,
-        ref_loc_bed = rules.annotate_reference_locus.output.mapping_bed,
+        ref_loc_bed = rules.annotate_reference_locus.output.loc_bed,
         can_mRNA = get_can_mRNA_path,
     output:
         temp_bam = temp( "tmp/ref_mappings/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}_canonical_mRNA_mappings.bam" ),
@@ -105,7 +105,7 @@ rule subset_alignment_bam_by_locus:
     '''subset alignment bam to reads that overlap annotated regions by annotate_reference_locus'''
     input:
         bam = "alignments/{SMP}/{ref1}/{SMP}_{SPRPOP}_FILTERED_{ref2}.mm.bam",
-        ref_loc_bed = rules.annotate_reference_locus.output.mapping_bed 
+        ref_loc_bed = rules.annotate_reference_locus.output.loc_bed 
     output:
         bam = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_mappings.bam",
         bai = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_mappings.bam.bai"
@@ -159,7 +159,7 @@ rule merge_locus_gff_info:
     '''add intersection of collapsed gff with reference annotation information'''
     input:
         gff = rules.collapse_to_isoforms.output.gff,
-        locus_bed = rules.annotate_reference_locus.output.mapping_bed
+        locus_bed = rules.annotate_reference_locus.output.loc_bed
     output:
         locus_gff = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_collapsed.gff"
     resources:
@@ -272,7 +272,7 @@ rule get_long_supported_isoforms:
     input:
         canonical_bed12 = rules.annotate_canonical_ref_mRNA.output.bed12 ,#canonical mRNA bed12
         abundance_tbl = rules.collapse_to_isoforms.output.abundance_tbl ,
-        ref_gene_mappings_bed = rules.annotate_reference_locus.output.mapping_bed,
+        ref_gene_mappings_bed = rules.annotate_reference_locus.output.loc_bed,
         isoform_gff = rules.add_introns_to_isoform_gff.output.intron_gff,
     output:
         keep_isos_tbl = "alignments/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_long_supported_isoforms.tbl",
