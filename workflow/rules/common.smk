@@ -25,7 +25,7 @@ def get_cram_ref(cram_file):
 
 def get_flnc(wc):
   '''given species sample info, find flnc file from manifest.'''
-  return manifest_df.loc[wc.SMP].isoseq_flnc or get_col_bam(wc)
+  return manifest_df.loc["__".join((wc['SMP'], wc["SPRPOP"]))].isoseq_flnc or get_col_bam(wc)
 
 #functions to process and get information about NHP reference.
 def get_nhp_ref(manifest_row):
@@ -46,7 +46,7 @@ def get_species_ref_link(manifest_row):
 def get_species_ref_path(wc):
     '''given sample species combo, return all nhp_ref mmi_index to use as reference'''
     ref_mmi_string = "mmdb/{SMP}/{superpop}_{ref_name}_ref.mmi"
-    ref_dict = get_species_ref_link(manifest_df.loc[ wc['SMP'] ])
+    ref_dict = get_species_ref_link(manifest_df.loc[ "__".join( (wc['SMP'], wc["SPRPOP"]) )  ])
     ref_out_name = ref_mmi_string.format(superpop = ref_dict['superpop'], ref_name = ref_dict['ref_name'], SMP = wc['SMP'])
     return ref_out_name
 
@@ -96,7 +96,7 @@ def get_col_bam(cur_sample , alignment_type = "sample_reference"):
 
 def get_nhp_ref_input( wc ):
     '''figure out if previous sample reference bam exists and return that or expanded sub bams of fracIDs.'''
-    cur_sample = wc.SMP    
+    cur_sample = "__".join((wc.SMP, wc.SPRPOP)) 
     prev_aln = get_col_bam(cur_sample, alignment_type = "sample_reference")
     if not prev_aln:
         return expand("tmp/alignments/{{SMP}}/{{ref_name}}/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{ref_name}}.mm.bam" , frac = fracIDs)
@@ -105,7 +105,7 @@ def get_nhp_ref_input( wc ):
 
 def get_t2t_input(wc):
     '''figure out if previous T2T aligned bam exists and return that or expanded sub bams from splitting by fracIDs'''
-    cur_sample = wc.SMP
+    cur_sample = "__".join((wc.SMP, wc.SPRPOP))
     prev_aln = get_col_bam(cur_sample, alignment_type = "T2T")
     return prev_aln or expand("tmp/alignments/{{SMP}}/t2t/{{SMP}}_{{SPRPOP}}_FILTERED_{frac}_{{t2t_version}}.mm.bam" , frac = fracIDs)
 
@@ -171,7 +171,7 @@ def get_can_mRNA_path(wc):
 
 def get_sample_reference(wc):
     '''given a reference name, like CHM13 or Jim_h1, return the path to that reference identified by one of the samples in the manifest'''
-    return manifest_df.loc[wc.SMP, "reference"] #[ref_path for ref_path in manifest_df["reference"] if get_nhp_ref_name( ref_path ) == wc.ref2 ][0]
+    return manifest_df.loc[ "__".join( (wc['SMP'], wc["SPRPOP"]) )   , "reference"] #[ref_path for ref_path in manifest_df["reference"] if get_nhp_ref_name( ref_path ) == wc.ref2 ][0]
 
 def get_all_intron_fas(wc):
     '''given manifest, get all intron fastas'''

@@ -20,7 +20,8 @@ include: "rules/common.smk"
 #get manifest
 os.listdir()
 manifest_df = pd.read_csv(config["manifest"], sep="\t", dtype=str)
-manifest_df  = manifest_df.set_index(["sample"], drop = False)
+manifest_df["unique_id"] = manifest_df["sample"].astype(str) + "__" + manifest_df["superpop"].astype(str)
+manifest_df  = manifest_df.set_index(["unique_id"], drop = True)
 
 wildcard_constraints:
     SMP = "|".join(manifest_df["sample"]),
