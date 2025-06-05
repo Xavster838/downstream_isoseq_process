@@ -1,3 +1,6 @@
+import gzip
+from Bio import SeqIO
+
 #these are the rules to align isoseq CCS libraries (fastq or unmapped bam) to the T2T and the associated NHP reference.
 rule fastq_from_bam:
     '''get fastq from flnc bam file... or T2T bam file'''
@@ -65,25 +68,33 @@ rule split_fastq:
         runtime_hrs=4
     threads:2
     run:
-        import gzip
-        from Bio import SeqIO
         outs = output["fastq"]
-        with gzip.open( input.fastq , "rt") as handle:
-            recs = list( SeqIO.parse(handle, "fastq") )
-            nrecs = len(recs)
-            nouts = len(outs)
+        total_reads = sum(1 for _ in SeqIO.parse(gzip.open(input['fastq'], "rt"), "fastq"))
+        n_outfiles = len(outs) 
+        chunk_sizes = [total_reads // n_outfiles + (1 if i < total_reads % n_outfiles else 0) for i in range(n_outfiles)]
+        out_handles = [gzip.open(f, "wt") if f.endswith(".gz") else open(f, "w") for f in outs]
+        out_idx = 0
+        written = 0
+        #write to each outfile
+        with gzip.open(input['fastq'], "rt") if input['fastq'].endswith(".gz") else open(input['fastq'], "r") as handle:
+            for rec in SeqIO.parse(handle, "fastq"):
+                _ = SeqIO.write(rec, out_handles[out_idx], "fastq",     )
+                written += 1
+                if written >= chunk_sizes[out_idx]:
+                    out_idx += 1
+                    written = 0
+                    if out_idx >= len(out_handles):
+                        break  # done writing
+        #close all handles
+        for h in out_handles:
+            h.close()
 
-            for idx, out in enumerate(outs):
-                start = int( idx*nrecs/nouts)
-                end = int(  (idx + 1)*nrecs/nouts)
-                print(start, end, nrecs)
-                SeqIO.write(recs[start:end], out, "fastq")
 
 
+##MAPPING INFO
 Hsa_ref = config['Hsa_ref']
 t2t_ref = config['T2T_ref']
 EXTRA_MMCMD = config['extra_minimap_flags'] if 'extra_minimap_flags' in config.keys() else "" #incase want to further specify minimap commands with splice size and other flags
-
 MMCMD = f"minimap2 -ax splice --sam-hit-only --secondary=yes -p 0.5 --eqx -K 2G {EXTRA_MMCMD}"
 
 
