@@ -14,7 +14,7 @@ shell.prefix(f"set -eo pipefail;")
 #report: "report/workflow.rst"
 
 #specify config file
-configfile: f"{SDIR}/../.test/config.yaml"
+#configfile: f"{SDIR}/../.test/config.yaml"
 #include common functions
 include: "rules/common.smk"
 #get manifest
