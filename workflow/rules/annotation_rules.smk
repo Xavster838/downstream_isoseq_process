@@ -34,7 +34,9 @@ rule collapse_to_isoforms:
         "../envs/annotation.yml"
     wildcard_constraints:
         ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
-        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
+        ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ), #dealing with fact that t2t has two different reference names
+        SPRPOP="|".join(manifest_df['superpop']),
+        SMP = "|".join(manifest_df["sample"])
     shell:"""
 isoseq3 collapse -j {threads} --log-file {log} {input.bam} {output.gff}
 sed -i 's/gene_id /gene_id=/g' {output.gff} 
