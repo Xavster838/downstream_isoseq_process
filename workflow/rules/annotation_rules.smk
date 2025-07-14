@@ -78,8 +78,8 @@ rule annotate_canonical_ref_mRNA:
         ref_loc_bed = rules.annotate_reference_locus.output.loc_bed,
         can_mRNA = get_can_mRNA_path,
     output:
-        temp_bam = temp( "tmp/ref_mappings/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}_canonical_mRNA_mappings.bam" ),
-        bed12 = "reference_annotations/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}_canonical_mRNA_mappings.bed12"
+        temp_bam = temp( "tmp/ref_mappings/{loc_name}/{SMP}__{SPRPOP}/{ref1}/{ref2}__{loc_name}_canonical_mRNA_mappings.bam" ),
+        bed12 = "reference_annotations/{loc_name}/{SMP}__{SPRPOP}/{ref1}/{ref2}__{loc_name}_canonical_mRNA_mappings.bed12"
     resources:
         mem_mb = 4000,
         runtime_hrs=4
