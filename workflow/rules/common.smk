@@ -300,7 +300,7 @@ def get_all_longest_supported_isoform_aa(wc):
 
 def get_all_ref_map_loci(wc):
     '''given manifest: get all isoseq paralog longest supported aa sequences'''
-    output_string = "reference_annotations/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}_mappings.bed"
+    output_string = "reference_annotations/{loc_name}/{SMP}__{SPRPOP}/{ref1}/{ref2}__{loc_name}_mappings.bed"
     out_fastas = []
     for cur_loc in list(config["ref_map_loci"].keys()):
         print(cur_loc)
