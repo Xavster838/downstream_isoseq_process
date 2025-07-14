@@ -51,7 +51,7 @@ rule annotate_reference_locus:
         ref = get_sample_reference,
         loc_seq = get_loc_path,
     output:
-        loc_bed = "reference_annotations/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}_mappings.bed"
+        loc_bed = "reference_annotations/{loc_name}/{SMP}__{SPRPOP}/{ref1}/{ref2}__{loc_name}_mappings.bed"
         #temp_mapping_psl = temp( "tmp/ref_mappings/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}.psl" ),
         #mapping_bed = "reference_annotations/{loc_name}/{SMP}/{ref1}/{ref2}__{loc_name}_mappings.bed"
     resources:
