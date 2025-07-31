@@ -5,7 +5,8 @@ rule get_iso_dot_plots:
     output:
         plt = "plots/{loc_name}/{SMP}/{ref1}/{SMP}__{SPRPOP}__{ref2}__{loc_name}_isoseq_dotplots.pdf"
     resources:
-        mem_mb = 4000
+        mem_mb = 4000,
+        runtime_hrs = 3
     threads : 2
     conda:
         "../envs/plotting.yml"
