@@ -22,7 +22,7 @@ rule get_alignment_stats:
         ref = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
         ref2 = "|".join(["hg38", Path(config['T2T_ref']).stem ] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) #dealing with fact that t2t has two different reference names
     shell:"""
-paste <(rb stats {input.bam}) <(samtools view {input.bam} | cut -f 2 | awk 'BEGIN{{print "alignment_flag"}}{{ptin $0}}') > {output.stats}
+    paste <(rb stats {input.bam}) <(samtools view {input.bam} | cut -f 2,14 | sed 's/AS:i://g' | awk -F '\\t' 'BEGIN{{OFS=FS; print "alignment_flag", "alignment_score"}}{{print $0}}') > {output.stats}
 """
 
 rule collapse_to_isoforms:
@@ -154,7 +154,7 @@ rule get_locus_alignment_stats:
     conda:
         "../envs/annotation.yml"
     shell:"""
-    paste <(rb stats {input.locus_bam}) <(samtools view {input.locus_bam} | cut -f 2 | awk 'BEGIN{{print "alignment_flag"}}{{print $0}}') > {output.stats}
+    paste <(rb stats {input.locus_bam}) <(samtools view {input.locus_bam} | cut -f 2,14 | sed 's/AS:i://g' | awk -F '\\t' 'BEGIN {{ OFS=FS; print "alignment_flag", "alignment_score" }} {{print $0}}') > {output.stats}
 """
 
 
