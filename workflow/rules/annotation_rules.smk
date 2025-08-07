@@ -1,3 +1,11 @@
+def compute_min_aln_size(wildcards, input):
+    # Read the first sequence in the fasta file
+    record = next(SeqIO.parse(input.loc_seq, "fasta"))
+    seq_len = len(record.seq)
+    aln_prop = config['min_map_len']
+    return int(seq_len * aln_prop)
+
+
 ##NOT locus SPECIFIC
 rule get_alignment_stats:
     input:
@@ -59,7 +67,8 @@ rule annotate_reference_locus:
         runtime_hrs=4
     threads: 4
     params:
-        min_aln_size = config['min_map_len']
+        # min_aln_size   = config['min_map_len'],
+        min_aln_length = compute_min_aln_size
     conda:
         "../envs/annotation.yml"
     wildcard_constraints:
@@ -67,8 +76,10 @@ rule annotate_reference_locus:
         ref1 = "|".join(["hg38", "t2t"] + [get_nhp_ref_name(x) for x in manifest_df["reference"]] ) ,
         ref2 = "|".join( [get_nhp_ref_name( ref_path ) for ref_path in manifest_df["reference"] ] ),
     shell:"""
-minimap2 -x asm20 --secondary=yes -p 0.8 --eqx -t {threads} -r 500 -K 100M {input.ref} {input.loc_seq} | 
-	awk -v min_size={params.min_aln_size} 'BEGIN{{OFS="\\t"}} ($9 - $8 >= min_size) {{print $6, $8, $9, $1, $10, $5}}' > {output.loc_bed}
+minimap2 -x asm20 --secondary=yes -N 50 -p 0.5 --eqx -t {threads} -r 6000 -G 6000 -K 100M {input.ref} {input.loc_seq} |
+    awk 'BEGIN{{OFS="\\t"}} {{print $6, $8, $9, $1, $10, $5}}' | 
+    bedtools sort | bedtools merge -s -d 1000 -c 4,5,6 -o distinct,collapse,distinct |  
+	awk -v min_size={params.min_aln_length} 'BEGIN{{OFS="\\t"}} ($3 - $2 >= min_size) {{print $0}}' > {output.loc_bed}
 """
 
 rule annotate_canonical_ref_mRNA:
